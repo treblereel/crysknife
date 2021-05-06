@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Treblereel
+ * Copyright (C) 2015 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -11,19 +11,21 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.crysknife.client;
+
+package io.crysknife.client.api;
 
 /**
- * @author Dmitrii Tikhomirov Created by treblereel 3/29/19
+ * A disposer exposes the bean managers explicit disposal functionality. An injected disposer can be
+ * used to dispose of the parameterized bean type.
+ *
+ * @author Mike Brock
  */
-public interface Instance<T> {
+public interface Disposer<T> {
 
-  <T> T get();
-
-  <T> T getInstance();
-
-  void destroy(T var1);
-
-  void destroyAll();
-
+  /**
+   * Requests that the bean manager dispose of the specified bean instance.
+   *
+   * @param beanInstance the instance of the bean to be disposed.
+   */
+  void dispose(T beanInstance);
 }

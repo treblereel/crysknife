@@ -34,6 +34,11 @@ public class InstanceImpl<T> implements Instance<T> {
   }
 
   @Override
+  public T getInstance() {
+    return provider.get();
+  }
+
+  @Override
   public void destroy(T var1) {}
 
   @Override

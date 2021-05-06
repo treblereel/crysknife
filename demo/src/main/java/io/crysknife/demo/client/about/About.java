@@ -14,10 +14,14 @@
 
 package io.crysknife.demo.client.about;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLDivElement;
+import io.crysknife.client.Reflect;
+import jsinterop.base.Js;
 import org.jboss.elemento.IsElement;
 import io.crysknife.ui.templates.client.annotation.DataField;
 import io.crysknife.ui.templates.client.annotation.Templated;

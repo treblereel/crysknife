@@ -11,19 +11,19 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.crysknife.client;
 
-/**
- * @author Dmitrii Tikhomirov Created by treblereel 3/29/19
- */
-public interface Instance<T> {
+package io.crysknife.demo.client;
 
-  <T> T get();
+import elemental2.dom.DomGlobal;
 
-  <T> T getInstance();
+import javax.enterprise.context.ApplicationScoped;
 
-  void destroy(T var1);
+@ApplicationScoped
+public class Test {
 
-  void destroyAll();
+    public String test;
 
+    public void init() {
+        DomGlobal.console.log(getClass().getCanonicalName() + " init called");
+    }
 }

@@ -14,6 +14,7 @@
 
 package org.treblereel.injection.dependent;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -35,6 +36,9 @@ public class SimpleDependentTest {
     this.constrOne = constrOne;
     this.constrTwo = constrTwo;
   }
+
+  @PostConstruct
+  private void init() {}
 
   public SimpleBeanDependent getFieldOne() {
     return fieldOne;

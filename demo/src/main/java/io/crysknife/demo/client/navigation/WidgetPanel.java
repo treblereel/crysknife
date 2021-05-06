@@ -61,6 +61,10 @@ public class WidgetPanel implements IsElement<HTMLDivElement> {
         return root;
     }
 
+    @Inject
+    public About about;
+
+
     @EventHandler("button")
     public void onClick(final ClickEvent e) {
         toAboutPage.go();
