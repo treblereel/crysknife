@@ -29,6 +29,7 @@ import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
+import io.crysknife.exception.GenerationException;
 import io.crysknife.generator.definition.BeanDefinition;
 
 /**
@@ -101,10 +102,11 @@ public class ClassBuilder {
     return getClassDeclaration().getExtendedTypes();
   }
 
-  public void addConstructorDeclaration(Modifier.Keyword... modifiers) {
+  public ConstructorDeclaration addConstructorDeclaration(Modifier.Keyword... modifiers) {
     if (constructorDeclaration == null) {
       this.constructorDeclaration = classDeclaration.addConstructor(modifiers);
     }
+    return constructorDeclaration;
   }
 
   public void addParametersToConstructor(Parameter p) {
@@ -116,7 +118,11 @@ public class ClassBuilder {
   }
 
   public void addStatementToConstructor(Expression expr) {
-    if (!statementToConstructor.contains(expr) && getConstructorDeclaration() != null) {
+    if (constructorDeclaration == null) {
+      this.constructorDeclaration = classDeclaration.addConstructor(Modifier.Keyword.PUBLIC);
+    }
+
+    if (!statementToConstructor.contains(expr)) {
       getConstructorDeclaration().getBody().addStatement(expr);
       statementToConstructor.add(expr);
     }

@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 
 import javax.inject.Named;
 import javax.inject.Provider;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.tools.JavaFileObject;
 
@@ -108,8 +107,11 @@ public class BeanManagerGenerator {
         value.setModifiers(Modifier.Keyword.PUBLIC);
         value.setName("value");
         value.setType(new ClassOrInterfaceType().setName("String"));
-        value.getBody().get().addAndGetStatement(
-            new ReturnStmt(new StringLiteralExpr(field.getAnnotation(Named.class).value())));
+        String namedValue = (field.getAnnotation(Named.class).value().length() == 0)
+            ? field.getQualifiedName().toString()
+            : field.getAnnotation(Named.class).value();
+
+        value.getBody().get().addAndGetStatement(new ReturnStmt(new StringLiteralExpr(namedValue)));
         anonymousClassBody.add(value);
       }
 
@@ -192,11 +194,16 @@ public class BeanManagerGenerator {
     private void generateInitEntry(MethodDeclaration init, TypeElement field, TypeElement factory,
         String annotation) {
       if (!iocContext.getBlacklist().contains(field.getQualifiedName().toString())) {
+        ObjectCreationExpr factoryCreationExpr = new ObjectCreationExpr();
+        factoryCreationExpr
+            .setType(new ClassOrInterfaceType().setName(Utils.getQualifiedFactoryName(factory)));
+        factoryCreationExpr.addArgument(new ThisExpr());
+
+
         MethodCallExpr call = new MethodCallExpr(new ThisExpr(), "register")
             .addArgument(
                 new FieldAccessExpr(new NameExpr(field.getQualifiedName().toString()), "class"))
-            .addArgument(
-                new MethodCallExpr(new NameExpr(Utils.getQualifiedFactoryName(factory)), "create"));
+            .addArgument(factoryCreationExpr);
         maybeAddQualifiers(call, factory, annotation);
         init.getBody().ifPresent(body -> body.addAndGetStatement(call));
       }

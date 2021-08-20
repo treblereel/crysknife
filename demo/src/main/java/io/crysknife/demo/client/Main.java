@@ -16,9 +16,11 @@ package io.crysknife.demo.client;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import elemental2.dom.HTMLDivElement;
+import elemental2.dom.HTMLElement;
 import org.jboss.elemento.IsElement;
 import io.crysknife.ui.templates.client.annotation.DataField;
 import io.crysknife.ui.templates.client.annotation.Templated;
@@ -38,6 +40,11 @@ public class Main implements IsElement<HTMLDivElement> {
 
     @Inject
     private Navigation navigation;
+
+    @Inject
+    @DataField
+    @Named("span")
+    private HTMLElement span;
 
     @PostConstruct
     public void init() {
