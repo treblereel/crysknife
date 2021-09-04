@@ -135,7 +135,7 @@ public abstract class ScopedBeanGenerator extends BeanIOCGenerator {
   }
 
   @Override
-  public void generateBeanFactory(ClassBuilder clazz, Definition definition) {
+  public void generate(ClassBuilder clazz, Definition definition) {
     if (definition instanceof BeanDefinition) {
 
       BeanDefinition beanDefinition = (BeanDefinition) definition;
@@ -299,7 +299,7 @@ public abstract class ScopedBeanGenerator extends BeanIOCGenerator {
   private void generateInstanceGetFieldDecorators(ClassBuilder clazz,
       BeanDefinition beanDefinition) {
     beanDefinition.getFieldInjectionPoints().forEach(fi -> {
-      fi.postActions.forEach(gen -> gen.generateBeanFactory(clazz, beanDefinition));
+      fi.postActions.forEach(gen -> gen.generate(clazz, beanDefinition));
     });
   }
 
