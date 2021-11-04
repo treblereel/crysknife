@@ -27,18 +27,17 @@ import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.CastExpr;
 import com.github.javaparser.ast.expr.EnclosedExpr;
 import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.NullLiteralExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
-import com.github.javaparser.ast.expr.ThisExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.ast.type.TypeParameter;
 import com.google.auto.common.MoreTypes;
 import io.crysknife.annotation.CircularDependency;
 import io.crysknife.annotation.Generator;
@@ -54,7 +53,6 @@ import io.crysknife.generator.context.IOCContext;
 import io.crysknife.util.Utils;
 
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.type.TypeKind;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -229,6 +227,7 @@ public class ProxyGenerator extends ScopedBeanGenerator<BeanDefinition> {
         .filter(elm -> !elm.getModifiers().contains(javax.lang.model.element.Modifier.ABSTRACT))
         .filter(elm -> !elm.getModifiers().contains(javax.lang.model.element.Modifier.NATIVE))
         .filter(elm -> !elm.getModifiers().contains(javax.lang.model.element.Modifier.FINAL))
+        .filter(elm -> !elm.getModifiers().contains(javax.lang.model.element.Modifier.DEFAULT))
         .filter(elm -> !OBJECT_METHODS.contains(elm.getSimpleName().toString())).forEach(elm -> {
           addMethod(wrapper, beanDefinition, elm);
         });
@@ -265,6 +264,18 @@ public class ProxyGenerator extends ScopedBeanGenerator<BeanDefinition> {
     MethodDeclaration methodDeclaration = wrapper.addMethod(elm.getSimpleName().toString(),
         modifierList.toArray(new Modifier.Keyword[modifierList.size()]));
 
+    MoreTypes.asExecutable(elm.asType()).getTypeVariables().forEach(tv -> {
+      String upperBound = tv.getUpperBound().toString();
+      String boundName = tv.asElement().toString();
+
+      TypeParameter param = new TypeParameter();
+      param.setName(boundName);
+      param.getTypeBound().add(new ClassOrInterfaceType().setName(upperBound));
+
+      methodDeclaration.getTypeParameters().add(param);
+
+    });
+
     methodDeclaration.setType(elm.getReturnType().toString());
     MethodCallExpr methodCallExpr =
         new MethodCallExpr(new NameExpr("this.instance"), elm.getSimpleName().toString());
@@ -272,10 +283,7 @@ public class ProxyGenerator extends ScopedBeanGenerator<BeanDefinition> {
 
     elm.getParameters().forEach(param -> {
       Parameter parameter = new Parameter();
-      String type =
-          param.asType().getKind().equals(TypeKind.TYPEVAR) ? "Object" : param.asType().toString();
-
-      parameter.setType(type);
+      parameter.setType(param.asType().toString());
       parameter.setName(param.getSimpleName().toString());
 
       methodDeclaration.addParameter(parameter);

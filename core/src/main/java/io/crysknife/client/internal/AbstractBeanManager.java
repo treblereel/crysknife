@@ -13,6 +13,7 @@
  */
 package io.crysknife.client.internal;
 
+import elemental2.dom.DomGlobal;
 import io.crysknife.client.BeanManager;
 import io.crysknife.client.IOCBeanDef;
 import io.crysknife.client.SyncBeanDef;
@@ -82,6 +83,8 @@ public abstract class AbstractBeanManager implements BeanManager {
   }
 
   private boolean compareAnnotations(Collection<Annotation> all, Annotation... in) {
+    // DomGlobal.console.log("compareAnnotations " + all.size() + " " + in.length);
+
     Annotation[] _all = all.toArray(new Annotation[all.size()]);
     return QualifierUtil.matches(in, _all);
   }
@@ -107,6 +110,7 @@ public abstract class AbstractBeanManager implements BeanManager {
   }
 
   <T> Collection<IOCBeanDef<T>> doLookupBean(final Class<T> type, Annotation... qualifiers) {
+    DomGlobal.console.log("doLookupBean " + type + " " + QualifierUtil.print(qualifiers));
     Collection<IOCBeanDef<T>> candidates = new HashSet<>();
     if (beans.containsKey(type)) {
 
@@ -179,6 +183,8 @@ public abstract class AbstractBeanManager implements BeanManager {
         }
       }
     }
+    DomGlobal.console.log("candidates " + type + " " + candidates.size());
+
     return candidates;
   }
 

@@ -25,6 +25,8 @@ import java.lang.annotation.Annotation;
  */
 public abstract class BeanFactory<T> {
 
+  private T t;
+
   protected BeanManager beanManager;
 
   protected SyncBeanDef beanDef;
@@ -39,11 +41,12 @@ public abstract class BeanFactory<T> {
     return instance;
   }
 
-  public abstract void initInstance(T instance);
+  public void initInstance(T instance) {
+    throw new UnsupportedOperationException("The factory, only supports contextual instances.");
+  }
 
   protected T createInstance() {
-    throw new UnsupportedOperationException(
-        "The factory, " + getClass().getSimpleName() + ", only supports contextual instances.");
+    throw new UnsupportedOperationException("The factory, only supports contextual instances.");
   }
 
 }

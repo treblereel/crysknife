@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to='App'>
+  <inherits name='com.google.gwt.user.User'/>
+
+  <inherits name="org.gwtproject.safecss.SafeCss"/>
+
+
+  <inherits name='com.google.gwt.user.theme.standard.Standard'/>
+  <inherits name='io.crysknife.Crysknife'/>
+  <inherits name='elemental2.dom.Dom'/>
+
+  <inherits name='io.crysknife.ui.mutationobserver.Mutationobserver'/>
+  <inherits name='io.crysknife.ui.navigation.Navigation'/>
+  <inherits name='io.crysknife.ui.databinding.Databinding'/>
+
+
+  <!--  <inherits name='io.crysknife.ui.templates.GWT3Template'/>
+    <inherits name='io.crysknife.ui.navigation.Navigation'/>
+    <inherits name='io.crysknife.ui.databinding.Databinding'/>
+    <inherits name='io.crysknife.ui.mutationobserver.Mutationobserver'/>
+    <inherits name="org.gwtproject.safecss.SafeCss"/>
+    <inherits name="org.gwtproject.dom.style.Style"/>-->
+
+  <entry-point class='io.crysknife.demo.client.App'/>
+
+  <source path='client'/>
+  <source path='shared'/>
+
+</module>

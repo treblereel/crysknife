@@ -23,10 +23,8 @@ import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -83,11 +81,53 @@ public class SyncBeanDefImpl<T> implements SyncBeanDef<T> {
   }
 
   @Override
+  public T getInstance() {
+    if (!factory.isPresent()) {
+      BeanManagerUtil.noFactoryResolutionException(actualType,
+          qualifiers.toArray(new Annotation[qualifiers.size()]));
+    }
+
+    if (scope.equals(Dependent.class)) {
+      return factory.get().getInstance();
+    }
+
+    if (instance.isPresent()) {
+      return instance.get();
+    }
+
+    if (!isProxy) {
+      instance = Optional.of(factory.get().getInstance());
+      return instance.get();
+    }
+
+    BeanFactory<T> _factory = factory.get();
+    // init Proxy
+    if (incompleteInstance == null) { // for all types,
+      incompleteInstance = _factory.createInstance();
+      ((ProxyBeanFactory) _factory).initDelegate(incompleteInstance);
+      instance = Optional.of(incompleteInstance);
+      incompleteInstance = null;
+      return instance.get();
+    } else {
+      return incompleteInstance;
+    }
+  }
+
+  @Override
   public Collection<Annotation> getQualifiers() {
     Set<Annotation> temp = new HashSet<>(defaultQualifiers);
     if (qualifiers != null)
       temp.addAll(qualifiers);
     return Collections.unmodifiableCollection(temp);
+  }
+
+  @Override
+  public T newInstance() {
+    if (!factory.isPresent()) {
+      BeanManagerUtil.noFactoryResolutionException(actualType,
+          qualifiers.toArray(new Annotation[qualifiers.size()]));
+    }
+    return factory.get().createInstance();
   }
 
   @Override
@@ -104,9 +144,18 @@ public class SyncBeanDefImpl<T> implements SyncBeanDef<T> {
     return factory;
   }
 
+  public Optional<Typed> getTyped() {
+    return typed;
+  }
+
   @Override
   public boolean matches(Set<Annotation> annotations) {
     return QualifierUtil.matches(annotations, getQualifiers());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(actualType);
   }
 
   @Override
@@ -120,62 +169,6 @@ public class SyncBeanDefImpl<T> implements SyncBeanDef<T> {
   }
 
   @Override
-  public String toString() {
-    String qualifiers = "";
-    if (this.qualifiers != null) {
-      qualifiers = BeanManagerUtil
-          .qualifiersToString(this.qualifiers.toArray(new Annotation[this.qualifiers.size()]));
-    }
-
-    return "[type=" + actualType + ", scope=" + scope.getSimpleName() + ", qualifiers=" + qualifiers
-        + "]";
-  }
-
-  @Override
-  public T getInstance() {
-    if (!factory.isPresent()) {
-      BeanManagerUtil.noFactoryResolutionException(actualType,
-          qualifiers.toArray(new Annotation[qualifiers.size()]));
-    }
-
-    if (scope.equals(Dependent.class)) {
-      return factory.get().getInstance();
-    }
-
-    if (!instance.isPresent()) {
-      BeanFactory<T> _factory = factory.get();
-      if (isProxy) {
-        // init Proxy
-        if (incompleteInstance == null) {
-          incompleteInstance = factory.get().createInstance();
-          ((ProxyBeanFactory) factory.get()).initDelegate(incompleteInstance);
-          instance = Optional.of(incompleteInstance);
-          incompleteInstance = null;
-          return instance.get();
-        } else {
-          return incompleteInstance;
-        }
-      }
-      instance = Optional.of(_factory.getInstance());
-    }
-
-    return instance.get();
-  }
-
-  @Override
-  public T newInstance() {
-    if (!factory.isPresent()) {
-      BeanManagerUtil.noFactoryResolutionException(actualType,
-          qualifiers.toArray(new Annotation[qualifiers.size()]));
-    }
-    return factory.get().createInstance();
-  }
-
-  public Optional<Typed> getTyped() {
-    return typed;
-  }
-
-  @Override
   public boolean equals(Object o) {
     if (this == o)
       return true;
@@ -186,8 +179,15 @@ public class SyncBeanDefImpl<T> implements SyncBeanDef<T> {
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(actualType);
+  public String toString() {
+    String qualifiers = "";
+    if (this.qualifiers != null) {
+      qualifiers = BeanManagerUtil
+          .qualifiersToString(this.qualifiers.toArray(new Annotation[this.qualifiers.size()]));
+    }
+
+    return "[type=" + actualType + ", scope=" + scope.getSimpleName() + ", qualifiers=" + qualifiers
+        + "]";
   }
 
   public static class Builder {
@@ -256,4 +256,7 @@ public class SyncBeanDefImpl<T> implements SyncBeanDef<T> {
       return definition;
     }
   }
+
+
+
 }

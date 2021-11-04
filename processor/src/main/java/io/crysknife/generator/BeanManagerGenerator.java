@@ -503,12 +503,10 @@ public class BeanManagerGenerator implements Task {
 
 
       builderCallExpr = new MethodCallExpr(builderCallExpr, "withFactory").addArgument(
-          new NameExpr("new BeanFactory<BeanManager>(this){\n" + "\n" + "                "
-              + "              @Override\n" + "                public BeanManager getInstance() {\n"
+          new NameExpr("new BeanFactory<BeanManager>(this){\n" + "                @Override\n"
+              + "                public BeanManager getInstance() {\n"
               + "                  return BeanManagerImpl.this;\n" + "                }\n"
-              + "                @Override \n"
-              + "                public void initInstance(BeanManager instance) { \n"
-              + "                } \n" + "              }"));
+              + "\n }"));
 
       builderCallExpr = new MethodCallExpr(builderCallExpr, "build");
       registerCallExpr.addArgument(builderCallExpr);

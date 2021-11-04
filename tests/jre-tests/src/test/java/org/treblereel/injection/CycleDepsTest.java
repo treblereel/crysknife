@@ -20,6 +20,13 @@ import org.junit.Test;
 import org.treblereel.AbstractTest;
 import org.treblereel.injection.cycle.AbstractRegistryFactory;
 import org.treblereel.injection.cycle.AdapterManager;
+import org.treblereel.injection.cycle.AdapterManagerImpl;
+import org.treblereel.injection.cycle.ClientDefinitionManager;
+import org.treblereel.injection.cycle.ClientRegistryFactoryImpl;
+import org.treblereel.injection.cycle.postconstruct.BeanHolder;
+import org.treblereel.injection.cycle.postconstruct.BeanOne;
+import org.treblereel.injection.cycle.postconstruct.BeanThree;
+import org.treblereel.injection.cycle.postconstruct.BeanTwo;
 import org.treblereel.injection.cycle.simple.SimpleBeanOne;
 import org.treblereel.injection.cycle.simple.SimpleBeanOneImpl;
 import org.treblereel.injection.cycle.simple.SimpleBeanTwo;
@@ -29,6 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Dmitrii Tikhomirov Created by treblereel 9/15/21
@@ -82,5 +90,30 @@ public class CycleDepsTest extends AbstractTest {
     assertEquals(
         "org.treblereel.injection.cycle.AdapterManagerImpl_Factory.ProxyAdapterManagerImpl",
         adapterManager.getClass().getCanonicalName());
+  }
+
+  @Test
+  public void testPostConstruct() {
+    BeanTwo beanTwo = app.beanManager.lookupBean(BeanTwo.class).getInstance();
+    assertEquals(1, beanTwo.getAtomicInteger().get());
+    assertEquals(1,
+        app.beanManager.lookupBean(BeanThree.class).getInstance().getAtomicInteger().get());
+    assertEquals(1, beanTwo.getThree().getAtomicInteger().get());
+    assertTrue(
+        app.beanManager.lookupBean(BeanThree.class).getInstance().equals(beanTwo.getThree()));
+    assertTrue(
+        app.beanManager.lookupBean(BeanThree.class).getInstance().equals(beanTwo.getThree()));
+    assertTrue(app.beanManager.lookupBean(BeanOne.class).getInstance()
+        .equals(beanTwo.getThree().getOne()));
+
+    assertTrue(app.beanManager.lookupBean(BeanHolder.class).getInstance().three
+        .equals(beanTwo.getThree()));
+  }
+
+  // @Test
+  public void testCrossCycle() {
+    assertEquals(ClientRegistryFactoryImpl.class,
+        app.beanManager.lookupBean(ClientDefinitionManager.class).getInstance().registryFactory
+            .getClass());
   }
 }
