@@ -89,7 +89,6 @@ import io.crysknife.ui.templates.generator.events.EventHandlerValidator;
 import io.crysknife.ui.templates.generator.translation.TranslationServiceGenerator;
 import io.crysknife.util.TypeUtils;
 import jsinterop.base.Js;
-import org.apache.commons.io.IOUtils;
 import org.jboss.gwt.elemento.processor.AbortProcessingException;
 import org.jboss.gwt.elemento.processor.ExpressionParser;
 import org.jboss.gwt.elemento.processor.TemplateSelector;
@@ -344,7 +343,7 @@ public class TemplateGenerator extends IOCGenerator<BeanDefinition> {
             if (templateContext.getStylesheet().isLess()) {
                 try {
                     String less =
-                            IOUtils.toString(templateContext.getStylesheet().getFile(), Charset.defaultCharset());
+                            new String(templateContext.getStylesheet().getFile().openStream().readAllBytes(), Charset.defaultCharset());
                     Less.compile(null, less, false);
                     final String compiledCss = Less.compile(null, less, false);
                     templateDefinition.setCss(templatedGeneratorUtils.escape(compiledCss));
@@ -355,7 +354,7 @@ public class TemplateGenerator extends IOCGenerator<BeanDefinition> {
             } else {
                 try {
                     String css =
-                            IOUtils.toString(templateContext.getStylesheet().getFile(), Charset.defaultCharset());
+                            new String(templateContext.getStylesheet().getFile().openStream().readAllBytes(), Charset.defaultCharset());
                     templateDefinition.setCss(templatedGeneratorUtils.escape(css));
                 } catch (IOException e) {
                     throw new GenerationException(
@@ -583,7 +582,7 @@ public class TemplateGenerator extends IOCGenerator<BeanDefinition> {
                 abortWithError(type, "Cannot find template \"%s\". Please make sure the template exists.",
                         fqTemplate);
             }
-            String html = IOUtils.toString(url, Charset.defaultCharset());
+            String html = new String(url.openStream().readAllBytes(), Charset.defaultCharset());
             Document document = Jsoup.parse(html);
             if (templateSelector.hasSelector()) {
                 org.jsoup.nodes.Element rootElement = getRoot(document, templateSelector.selector);
