@@ -5,7 +5,7 @@
 
   <groupId>io.crysknife.demo</groupId>
   <artifactId>demo</artifactId>
-  <version>0.9</version>
+  <version>0.10</version>
   <packaging>jar</packaging>
 
   <properties>
@@ -15,8 +15,8 @@
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
 
-    <j2cl.platform.version>20251001-1</j2cl.platform.version>
-    <org.treblereel.j2cl.processors.version>0.9</org.treblereel.j2cl.processors.version>
+    <j2cl.platform.version>20260527-1</j2cl.platform.version>
+    <org.treblereel.j2cl.processors.version>0.10</org.treblereel.j2cl.processors.version>
   </properties>
 
   <dependencyManagement>
@@ -91,6 +91,7 @@
       <plugin>
         <groupId>org.kie.j2cl.tools</groupId>
         <artifactId>j2cl-maven-plugin</artifactId>
+          <version>0.23.8</version>
         <executions>
           <execution>
             <id>build-js</id>
