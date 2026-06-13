@@ -41,7 +41,11 @@
            Js.asPropertyMap(instance).set(Reflect.objectProperty("${element.mangledName}", instance), TemplateUtil.resolveElement(instance.getElement(), "${element.name}"));
     </#if>
        } else {
+<#if element.elementoIsElement>
+           TemplateUtil.replaceElement(instance.getElement(), "${element.name}", (elemental2.dom.HTMLElement) ((${element.element}) Js.asPropertyMap(instance).get(Reflect.objectProperty("${element.mangledName}", instance))).element());
+<#else>
            TemplateUtil.replaceElement(instance.getElement(), "${element.name}", ((${element.element}) Js.asPropertyMap(instance).get(Reflect.objectProperty("${element.mangledName}", instance))));
+</#if>
        }
 </#list>
 

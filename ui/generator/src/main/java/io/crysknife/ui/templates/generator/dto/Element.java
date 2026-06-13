@@ -21,16 +21,23 @@ public class Element {
   private final String element;
 
   private final boolean needCast;
+  private final boolean elementoIsElement;
 
   public Element(String name, String mangledName, String element) {
-    this(name, mangledName, element, false);
+    this(name, mangledName, element, false, false);
   }
 
   public Element(String name, String mangledName, String element, boolean needCast) {
+    this(name, mangledName, element, needCast, false);
+  }
+
+  public Element(String name, String mangledName, String element, boolean needCast,
+      boolean elementoIsElement) {
     this.name = name;
     this.mangledName = mangledName;
     this.element = element;
     this.needCast = needCast;
+    this.elementoIsElement = elementoIsElement;
   }
 
   public String getName() {
@@ -47,5 +54,9 @@ public class Element {
 
   public boolean isNeedCast() {
     return needCast;
+  }
+
+  public boolean isElementoIsElement() {
+    return elementoIsElement;
   }
 }
