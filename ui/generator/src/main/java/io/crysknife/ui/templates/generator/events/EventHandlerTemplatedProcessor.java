@@ -29,24 +29,34 @@ import javax.lang.model.util.ElementFilter;
 
 import com.google.auto.common.MoreElements;
 import com.google.auto.common.MoreTypes;
+import io.crysknife.definition.BeanDefinition;
 import io.crysknife.exception.GenerationException;
 import io.crysknife.exception.UnableToCompleteException;
 import io.crysknife.generator.context.IOCContext;
+import io.crysknife.generator.helpers.MethodCallGenerator;
 import io.crysknife.ui.templates.client.annotation.EventHandler;
 import io.crysknife.ui.templates.client.annotation.ForEvent;
+import io.crysknife.ui.templates.client.annotation.SinkNative;
+import io.crysknife.ui.templates.generator.dto.Event;
+import io.crysknife.ui.templates.generator.dto.TemplateDefinition;
 import org.jboss.gwt.elemento.processor.AbortProcessingException;
 import org.jboss.gwt.elemento.processor.context.DataElementInfo;
 import org.jboss.gwt.elemento.processor.context.EventHandlerInfo;
 import org.jboss.gwt.elemento.processor.context.TemplateContext;
+import org.treblereel.j2cl.processors.utils.J2CLUtils;
 
 public class EventHandlerTemplatedProcessor {
 
   private final IOCContext iocContext;
-  private EventHandlerValidator eventHandlerValidator;
+  private final EventHandlerValidator eventHandlerValidator;
+  private final J2CLUtils j2CLUtils;
+  private final MethodCallGenerator methodCallGenerator;
 
   public EventHandlerTemplatedProcessor(IOCContext context) {
     this.iocContext = context;
     this.eventHandlerValidator = new EventHandlerValidator(iocContext);
+    this.j2CLUtils = new J2CLUtils(context.getGenerationContext().getProcessingEnvironment());
+    this.methodCallGenerator = new MethodCallGenerator(context);
   }
 
   public List<EventHandlerInfo> processEventHandlers(TypeElement type,
@@ -93,6 +103,32 @@ public class EventHandlerTemplatedProcessor {
       throw new GenerationException(new UnableToCompleteException(errors));
     }
     return eventHandlerElements;
+  }
+
+  public void generateEventCode(BeanDefinition beanDefinition, TemplateContext templateContext,
+                                TemplateDefinition templateDefinition) {
+    for (EventHandlerInfo eventHandlerInfo : templateContext.getEvents()) {
+      try {
+        eventHandlerValidator.validate(eventHandlerInfo.getMethod());
+        if (MoreElements.isAnnotationPresent(eventHandlerInfo.getMethod(), SinkNative.class)) {
+          throw new GenerationException(
+                  String.format("Method %s annotated with @SinkNative must be static",
+                          eventHandlerInfo.getMethod().getSimpleName()));
+        } else {
+          String[] eventTypes = eventHandlerInfo.getMethod().getParameters().get(0)
+                  .getAnnotation(ForEvent.class).value();
+          String clazz = iocContext.getGenerationContext().getTypes()
+                  .erasure(eventHandlerInfo.getMethod().getParameters().get(0).asType()).toString();
+          String mangleName = j2CLUtils.getVariableMangledName(eventHandlerInfo.getInfo().getField());
+          String call = methodCallGenerator.generate(beanDefinition.getType(),
+                  eventHandlerInfo.getMethod(), List.of("e"));
+          Event event = new Event(eventTypes, mangleName, clazz, call);
+          templateDefinition.getEvents().add(event);
+        }
+      } catch (UnableToCompleteException e) {
+        throw new GenerationException(e);
+      }
+    }
   }
 
   private String[] getEvents(VariableElement parameter) {
