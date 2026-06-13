@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 Treblereel
+ * Copyright © 2026 Treblereel
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -12,29 +12,23 @@
  * the License.
  */
 
-package org.treblereel.startup;
+package org.treblereel.injection.alternative.lifecycle;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.ejb.Startup;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 
-/**
- * @author Dmitrii Tikhomirov Created by treblereel 10/6/21
- */
 @ApplicationScoped
-@Startup
-public class OnStartup {
+public class DefaultLifecycleBean implements LifecycleIface {
 
-  @Inject
-  private OnStartupDetector onStartupDetector;
-
-  @Inject
-  private StartupTracker tracker;
+  private String initValue;
 
   @PostConstruct
   public void init() {
-    onStartupDetector.setResult(getClass().getCanonicalName());
-    tracker.record(getClass().getCanonicalName());
+    initValue = "default-init";
+  }
+
+  @Override
+  public String getInitValue() {
+    return initValue;
   }
 }
