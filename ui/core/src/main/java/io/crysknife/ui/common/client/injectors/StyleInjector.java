@@ -32,7 +32,7 @@ public class StyleInjector {
   private HTMLStyleElement createElement(String contents) {
     HTMLStyleElement style = (HTMLStyleElement) DomGlobal.document.createElement("style");
     style.setAttribute("language", "text/css");
-    style.innerHTML = contents;
+    style.textContent = contents;
     return style;
   }
 

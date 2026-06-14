@@ -25,6 +25,7 @@ import elemental2.dom.Node;
 import elemental2.dom.NodeFilter;
 import elemental2.dom.TreeWalker;
 import io.crysknife.client.IsElement;
+import io.crysknife.ui.common.client.SafeHtmlUtils;
 import jsinterop.base.Js;
 
 /**
@@ -79,7 +80,7 @@ public final class TemplateUtil {
 
       if (!oldElement.innerHTML.isEmpty()) {
         if (newElement.innerHTML.isEmpty()) {
-          newElement.innerHTML = oldElement.innerHTML;
+          SafeHtmlUtils.setInnerHTML(newElement, oldElement.innerHTML);
         } else {
           while (oldElement.hasChildNodes()) {
             newElement.appendChild(oldElement.firstChild);

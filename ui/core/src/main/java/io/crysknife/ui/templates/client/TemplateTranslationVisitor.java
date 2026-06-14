@@ -17,6 +17,7 @@ package io.crysknife.ui.templates.client;
 import java.util.function.Function;
 
 import elemental2.dom.Element;
+import io.crysknife.ui.common.client.SafeHtmlUtils;
 
 
 /**
@@ -46,7 +47,7 @@ public class TemplateTranslationVisitor extends TemplateVisitor {
     String translationKey = i18nKeyPrefix + getOrGenerateTranslationKey(element);
     String translationValue = getI18nValue(translationKey);
     if (translationValue != null)
-      element.innerHTML = translationValue;
+      SafeHtmlUtils.setInnerHTML(element, translationValue);
   }
 
   /**
