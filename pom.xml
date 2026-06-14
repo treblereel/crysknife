@@ -352,7 +352,7 @@
                         <version>${maven.central.publishing.plugin}</version>
                         <extensions>true</extensions>
                         <configuration>
-                            <publishingServerId>sonatype</publishingServerId>
+                            <publishingServerId>central</publishingServerId>
                         </configuration>
                     </plugin>
                 </plugins>

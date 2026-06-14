@@ -16,5 +16,6 @@
   <modules>
     <module>jre-tests</module>
     <module>j2cl-tests</module>
+    <module>j2cl-tests-commons</module>
   </modules>
 </project>
