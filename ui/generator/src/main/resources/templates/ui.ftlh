@@ -32,7 +32,7 @@
 <#list attributes as attribute>
        instance.getElement().setAttribute("${attribute.name}", "${attribute.value?no_esc}");
 </#list>
-       instance.getElement().innerHTML = "${html?no_esc}";
+       io.crysknife.ui.common.client.SafeHtmlUtils.setInnerHTML(instance.getElement(), "${html?no_esc}");
 <#list elements as element>
        if (Js.asPropertyMap(instance).get(Reflect.objectProperty("${element.mangledName}", instance)) == null) {
     <#if element.needCast>
