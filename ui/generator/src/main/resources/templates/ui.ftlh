@@ -51,7 +51,13 @@
 
 <#list events as event>
     <#list event.eventTypes as type>
+    <#if event.elementoIsElement>
+       eventHandlerRegistration.add(instance, new EventHandlerHolder("${type}", (elemental2.dom.HTMLElement) ((org.jboss.elemento.IsElement) Js.asPropertyMap(instance).get(Reflect.objectProperty("${event.mangleName}", instance))).element(), (e) -> {
+    <#elseif event.isElement>
+       eventHandlerRegistration.add(instance, new EventHandlerHolder("${type}", ((io.crysknife.client.IsElement) Js.asPropertyMap(instance).get(Reflect.objectProperty("${event.mangleName}", instance))).getElement(), (e) -> {
+    <#else>
        eventHandlerRegistration.add(instance, new EventHandlerHolder("${type}", ((elemental2.dom.HTMLElement) Js.asPropertyMap(instance).get(Reflect.objectProperty("${event.mangleName}", instance))), (e) -> {
+    </#if>
            ${event.call?no_esc}
        }));
     </#list>

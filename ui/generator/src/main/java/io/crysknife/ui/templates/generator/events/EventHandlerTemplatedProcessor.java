@@ -41,6 +41,7 @@ import io.crysknife.ui.templates.generator.dto.Event;
 import io.crysknife.ui.templates.generator.dto.TemplateDefinition;
 import org.jboss.gwt.elemento.processor.AbortProcessingException;
 import org.jboss.gwt.elemento.processor.context.DataElementInfo;
+import org.jboss.gwt.elemento.processor.context.DataElementInfo.Kind;
 import org.jboss.gwt.elemento.processor.context.EventHandlerInfo;
 import org.jboss.gwt.elemento.processor.context.TemplateContext;
 import org.treblereel.j2cl.processors.utils.J2CLUtils;
@@ -122,7 +123,10 @@ public class EventHandlerTemplatedProcessor {
           String mangleName = j2CLUtils.getVariableMangledName(eventHandlerInfo.getInfo().getField());
           String call = methodCallGenerator.generate(beanDefinition.getType(),
                   eventHandlerInfo.getMethod(), List.of("e"));
-          Event event = new Event(eventTypes, mangleName, clazz, call);
+          DataElementInfo info = eventHandlerInfo.getInfo();
+          boolean isElement = info != null && info.getKind() == Kind.IsElement;
+          boolean elementoIsElement = info != null && info.getKind() == Kind.ElementoIsElement;
+          Event event = new Event(eventTypes, mangleName, clazz, call, isElement, elementoIsElement);
           templateDefinition.getEvents().add(event);
         }
       } catch (UnableToCompleteException e) {
