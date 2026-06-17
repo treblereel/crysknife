@@ -79,6 +79,7 @@ public class App {
                     .addItem(navigationItem("checkbox", "Checkbox", "#CheckboxDemo"))
                     .addItem(navigationItem("code-block", "Code block", "#CodeBlockDemo"))
                     .addItem(navigationItem("content", "Content", "#ContentDemo"))
+                    .addItem(navigationItem("dashboard", "Dashboard", "#DashboardDemo"))
                     .addItem(navigationItem("data-list", "Data list", "#DataListDemo"))
                     .addItem(navigationItem("description-list", "Description list", "#DescriptionListDemo"))
                     .addItem(navigationItem("divider", "Divider", "#DividerDemo"))
