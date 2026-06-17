@@ -59,4 +59,8 @@ public class ButtonDemo implements IsElement<HTMLDivElement> {
   public void onPrimaryClick(@ForEvent("click") final MouseEvent e) {
     primaryBtn.text("Clicked!");
   }
+
+  @EventHandler
+  public void onRootClick(@ForEvent("click") final MouseEvent e) {
+  }
 }

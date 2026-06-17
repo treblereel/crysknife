@@ -120,13 +120,16 @@ public class EventHandlerTemplatedProcessor {
                   .getAnnotation(ForEvent.class).value();
           String clazz = iocContext.getGenerationContext().getTypes()
                   .erasure(eventHandlerInfo.getMethod().getParameters().get(0).asType()).toString();
-          String mangleName = j2CLUtils.getVariableMangledName(eventHandlerInfo.getInfo().getField());
           String call = methodCallGenerator.generate(beanDefinition.getType(),
                   eventHandlerInfo.getMethod(), List.of("e"));
           DataElementInfo info = eventHandlerInfo.getInfo();
-          boolean isElement = info != null && info.getKind() == Kind.IsElement;
-          boolean elementoIsElement = info != null && info.getKind() == Kind.ElementoIsElement;
-          Event event = new Event(eventTypes, mangleName, clazz, call, isElement, elementoIsElement);
+          boolean rootBound = info == null;
+          String mangleName = rootBound ? null
+                  : j2CLUtils.getVariableMangledName(info.getField());
+          boolean isElement = !rootBound && info.getKind() == Kind.IsElement;
+          boolean elementoIsElement = !rootBound && info.getKind() == Kind.ElementoIsElement;
+          Event event = new Event(eventTypes, mangleName, clazz, call,
+                  isElement, elementoIsElement, rootBound);
           templateDefinition.getEvents().add(event);
         }
       } catch (UnableToCompleteException e) {
