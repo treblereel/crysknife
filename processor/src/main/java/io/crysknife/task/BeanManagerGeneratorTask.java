@@ -333,7 +333,7 @@ public class BeanManagerGeneratorTask implements Task {
     private void addEventManager(MethodDeclaration init) {
       String statement =
           "register(new Builder(io.crysknife.client.internal.event.EventManager.class, jakarta.inject.Singleton.class)"
-              + ".withAssignableTypes(new Class[] { io.crysknife.client.internal.event.EventManager.class, io.crysknife.client.internal.AbstractEventFactory.class })"
+              + ".withAssignableTypes(new Class[] { io.crysknife.client.internal.event.EventManager.class })"
               + ".withFactory(new io.crysknife.client.internal.event.EventManager.EventManagerFactory(this)).build());";
       init.getBody().ifPresent(body -> body.addAndGetStatement(statement));
 
