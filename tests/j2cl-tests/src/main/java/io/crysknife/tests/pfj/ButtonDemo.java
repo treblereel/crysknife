@@ -17,10 +17,13 @@ package io.crysknife.tests.pfj;
 import jakarta.inject.Singleton;
 
 import elemental2.dom.HTMLDivElement;
+import elemental2.dom.MouseEvent;
 import io.crysknife.client.IsElement;
 import io.crysknife.ui.navigation.client.DefaultPage;
 import io.crysknife.ui.navigation.client.annotation.Page;
 import io.crysknife.ui.templates.client.annotation.DataField;
+import io.crysknife.ui.templates.client.annotation.EventHandler;
+import io.crysknife.ui.templates.client.annotation.ForEvent;
 import io.crysknife.ui.templates.client.annotation.Templated;
 import org.patternfly.component.button.Button;
 
@@ -51,4 +54,9 @@ public class ButtonDemo implements IsElement<HTMLDivElement> {
 
   @DataField
   Button disabledBtn = button("Disabled").primary().disabled();
+
+  @EventHandler("primaryBtn")
+  public void onPrimaryClick(@ForEvent("click") final MouseEvent e) {
+    primaryBtn.text("Clicked!");
+  }
 }

@@ -20,12 +20,17 @@ public class Event {
   private final String mangleName;
   private final String clazz;
   private final String call;
+  private final boolean isElement;
+  private final boolean elementoIsElement;
 
-  public Event(String[] eventTypes, String mappedName, String clazz, String call) {
+  public Event(String[] eventTypes, String mappedName, String clazz, String call,
+      boolean isElement, boolean elementoIsElement) {
     this.eventTypes = eventTypes;
     this.mangleName = mappedName;
     this.clazz = clazz;
     this.call = call;
+    this.isElement = isElement;
+    this.elementoIsElement = elementoIsElement;
   }
 
   public String getMangleName() {
@@ -42,5 +47,13 @@ public class Event {
 
   public String[] getEventTypes() {
     return eventTypes;
+  }
+
+  public boolean isIsElement() {
+    return isElement;
+  }
+
+  public boolean isElementoIsElement() {
+    return elementoIsElement;
   }
 }
