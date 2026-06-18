@@ -56,4 +56,10 @@ public class SafeHtmlUtilsTest {
     assertEquals(1, div.childElementCount);
     assertEquals("Nested", div.querySelector("p").textContent);
   }
+
+  @Test
+  public void testDefaultPolicyName() {
+    assertEquals("crysknife",
+        System.getProperty("crysknife.trustedtype.policy.name", "crysknife"));
+  }
 }

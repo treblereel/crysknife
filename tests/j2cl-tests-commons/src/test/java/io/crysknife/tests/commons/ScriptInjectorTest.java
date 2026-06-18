@@ -35,4 +35,14 @@ public class ScriptInjectorTest {
     String result = (String) win.get("__ck_test_value");
     assertEquals("crysknife_works", result);
   }
+
+  @Test
+  public void testInjectScriptWithDefaultWindow() {
+    String jsCode = "window.__ck_default_win_test = 'default_works';";
+    ScriptInjector.fromString(jsCode).inject();
+
+    JsPropertyMap<Object> win = Js.asPropertyMap(DomGlobal.window);
+    String result = (String) win.get("__ck_default_win_test");
+    assertEquals("default_works", result);
+  }
 }

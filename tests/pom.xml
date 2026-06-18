@@ -17,5 +17,6 @@
     <module>jre-tests</module>
     <module>j2cl-tests</module>
     <module>j2cl-tests-commons</module>
+    <module>j2cl-tests-custom-policy</module>
   </modules>
 </project>

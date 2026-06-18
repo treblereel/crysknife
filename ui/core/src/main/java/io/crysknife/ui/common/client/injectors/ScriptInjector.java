@@ -25,7 +25,7 @@ import jsinterop.annotations.JsFunction;
 public class ScriptInjector {
 
   public static final Window TOP_WINDOW = DomGlobal.window;
-  public Window window;
+  public Window window = DomGlobal.window;
 
   private HTMLScriptElement scriptElement;
 
