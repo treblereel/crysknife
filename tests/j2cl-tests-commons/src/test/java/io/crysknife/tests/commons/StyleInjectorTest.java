@@ -15,10 +15,12 @@
 package io.crysknife.tests.commons;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import com.google.j2cl.junit.apt.J2clTestInput;
 import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLDivElement;
+import elemental2.dom.HTMLElement;
 import jsinterop.base.Js;
 import org.junit.Test;
 import io.crysknife.ui.common.client.injectors.StyleInjector;
@@ -61,5 +63,42 @@ public class StyleInjectorTest {
 
     Window window = Js.uncheckedCast(DomGlobal.window);
     assertEquals("rgb(255, 255, 0)", window.getComputedStyle(tested).backgroundColor);
+  }
+
+  @Test
+  public void testStyleInjectionFromUrl() {
+    StyleInjector.fromUrl("test-style.css").inject();
+
+    boolean found = false;
+    for (int i = 0; i < DomGlobal.document.head.childNodes.length; i++) {
+      if ("LINK".equals(DomGlobal.document.head.childNodes.getAt(i).nodeName)) {
+        HTMLElement link = (HTMLElement) DomGlobal.document.head.childNodes.getAt(i);
+        if ("test-style.css".equals(link.getAttribute("href"))) {
+          assertEquals("stylesheet", link.getAttribute("rel"));
+          found = true;
+          break;
+        }
+      }
+    }
+    assertTrue(found);
+  }
+
+  @Test
+  public void testStyleInjectionUsesTypeAttribute() {
+    String css = ".ck-type-test { color: red; }";
+    StyleInjector.fromString(css).inject();
+
+    boolean found = false;
+    for (int i = 0; i < DomGlobal.document.head.childNodes.length; i++) {
+      if ("STYLE".equals(DomGlobal.document.head.childNodes.getAt(i).nodeName)) {
+        HTMLElement style = (HTMLElement) DomGlobal.document.head.childNodes.getAt(i);
+        if (style.textContent != null && style.textContent.contains(".ck-type-test")) {
+          assertEquals("text/css", style.getAttribute("type"));
+          found = true;
+          break;
+        }
+      }
+    }
+    assertTrue(found);
   }
 }

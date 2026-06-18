@@ -24,6 +24,8 @@ import jsinterop.base.Js;
 
 public final class SafeHtmlUtils {
 
+  private static final String POLICY_NAME =
+      System.getProperty("crysknife.trustedtype.policy.name", "crysknife");
   private static TrustedTypePolicy policy;
   private static boolean initialized;
 
@@ -39,7 +41,7 @@ public final class SafeHtmlUtils {
         opts.setCreateHTML((input, args) -> input);
         opts.setCreateScript((input, args) -> input);
         opts.setCreateScriptURL((input, args) -> input);
-        policy = factory.createPolicy("crysknife", opts);
+        policy = factory.createPolicy(POLICY_NAME, opts);
       }
     }
   }
