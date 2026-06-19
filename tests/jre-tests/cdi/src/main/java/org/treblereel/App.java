@@ -20,6 +20,8 @@ import jakarta.inject.Inject;
 
 import io.crysknife.annotation.Application;
 import io.crysknife.client.BeanManager;
+import org.treblereel.interceptor.InterceptedService;
+import org.treblereel.interceptor.LoggingInterceptor;
 import org.treblereel.injection.applicationscoped.SimpleBeanApplicationScoped;
 import org.treblereel.injection.dependent.SimpleBeanDependent;
 import org.treblereel.injection.dependent.SimpleDependentTest;
@@ -84,6 +86,12 @@ public class App {
 
   @Inject
   public SpecializesBeanHolder specializesBeanHolder;
+
+  @Inject
+  public InterceptedService interceptedService;
+
+  @Inject
+  public LoggingInterceptor loggingInterceptor;
 
   public void onModuleLoad() {
     new AppBootstrap(this).initialize();

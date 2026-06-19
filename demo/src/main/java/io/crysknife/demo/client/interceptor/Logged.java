@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Treblereel
+ * Copyright © 2024 Treblereel
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -11,24 +11,17 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.crysknife.client.internal.proxy;
+package io.crysknife.demo.client.interceptor;
 
-import jsinterop.base.Js;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-/**
- * @author Dmitrii Tikhomirov Created by treblereel 12/18/19
- */
-public final class ProxySetInterceptor implements SetFN {
+import jakarta.interceptor.InterceptorBinding;
 
-  private final Object target;
-
-  public ProxySetInterceptor(Object target) {
-    this.target = target;
-  }
-
-  @Override
-  public boolean onInvoke(Object object, String objectKey, Object value) {
-    Js.asPropertyMap(object).set(objectKey, value);
-    return true;
-  }
+@InterceptorBinding
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD, ElementType.TYPE})
+public @interface Logged {
 }
