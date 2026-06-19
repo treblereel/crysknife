@@ -20,6 +20,23 @@ import jakarta.inject.Inject;
 
 import io.crysknife.annotation.Application;
 import io.crysknife.client.BeanManager;
+import org.treblereel.decorator.Greeter;
+import org.treblereel.decorator.LoggingGreeterDecorator;
+import org.treblereel.decorator.SimpleGreeter;
+import org.treblereel.decorator.chain.BasicFormatter;
+import org.treblereel.decorator.chain.BracketFormatterDecorator;
+import org.treblereel.decorator.chain.Formatter;
+import org.treblereel.decorator.chain.StarFormatterDecorator;
+import org.treblereel.decorator.exception.StrictValidator;
+import org.treblereel.decorator.exception.TrimValidatorDecorator;
+import org.treblereel.decorator.exception.Validator;
+import org.treblereel.decorator.lifecycle.PostConstructWorkerDecorator;
+import org.treblereel.decorator.lifecycle.SimpleWorker;
+import org.treblereel.decorator.lifecycle.Worker;
+import org.treblereel.decorator.multiface.LoggingPrinterDecorator;
+import org.treblereel.decorator.multiface.MultiDevice;
+import org.treblereel.decorator.multiface.Printer;
+import org.treblereel.decorator.multiface.Scanner;
 import org.treblereel.interceptor.InterceptedService;
 import org.treblereel.interceptor.LoggingInterceptor;
 import org.treblereel.injection.applicationscoped.SimpleBeanApplicationScoped;
@@ -86,6 +103,57 @@ public class App {
 
   @Inject
   public SpecializesBeanHolder specializesBeanHolder;
+
+  @Inject
+  public Greeter greeter;
+
+  @Inject
+  public LoggingGreeterDecorator loggingGreeterDecorator;
+
+  @Inject
+  public SimpleGreeter simpleGreeter;
+
+  @Inject
+  public Formatter formatter;
+
+  @Inject
+  public BasicFormatter basicFormatter;
+
+  @Inject
+  public BracketFormatterDecorator bracketFormatterDecorator;
+
+  @Inject
+  public StarFormatterDecorator starFormatterDecorator;
+
+  @Inject
+  public Printer printer;
+
+  @Inject
+  public Scanner scanner;
+
+  @Inject
+  public MultiDevice multiDevice;
+
+  @Inject
+  public LoggingPrinterDecorator loggingPrinterDecorator;
+
+  @Inject
+  public Worker worker;
+
+  @Inject
+  public PostConstructWorkerDecorator postConstructWorkerDecorator;
+
+  @Inject
+  public SimpleWorker simpleWorker;
+
+  @Inject
+  public Validator validator;
+
+  @Inject
+  public TrimValidatorDecorator trimValidatorDecorator;
+
+  @Inject
+  public StrictValidator strictValidator;
 
   @Inject
   public InterceptedService interceptedService;

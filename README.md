@@ -194,7 +194,7 @@ How to compile and run your application and how to run development mode, please 
 
 ## 2.1. What is CDI?
 
-CDI stands for Contexts and Dependency Injection. Dependency Injection is a design pattern that allows us to remove the hard-coded dependencies and make our application loosely coupled, extendable and maintainable. Crysknife doesn't support decorators and transactions. 
+CDI stands for Contexts and Dependency Injection. Dependency Injection is a design pattern that allows us to remove the hard-coded dependencies and make our application loosely coupled, extendable and maintainable. Crysknife doesn't support transactions. 
 
 tip: It's important to note that Crysknife provides lazy initialization of beans. It means that the bean is created only when it is needed.
 
@@ -741,7 +741,73 @@ Additionally:
 * `@PostConstruct` and `@PreDestroy` lifecycle methods are excluded from interception
 * Interceptor classes must be managed beans (annotated with a scope such as `@ApplicationScoped`)
 
-## 2.10 BeanManager
+## 2.10 Decorators
+
+CDI Decorators allow you to transparently wrap a bean's interface with additional behavior. Unlike interceptors (which are generic and cross-cutting), decorators are aware of the bean's business semantics — they implement the same interface and can selectively override methods.
+
+### 2.10.1 @Decorator + @Delegate
+
+To create a decorator, annotate a class with `@Decorator` and implement the same interface as the bean you want to decorate. Use `@Inject @Delegate` on a field to hold a reference to the original (or next) bean in the chain:
+
+```java
+public interface PaymentService {
+    void pay(BigDecimal amount);
+}
+
+@ApplicationScoped
+public class CreditCardPaymentService implements PaymentService {
+    public void pay(BigDecimal amount) {
+        // process credit card payment
+    }
+}
+
+@ApplicationScoped
+@Decorator
+@Priority(1000)
+public class LoggingPaymentDecorator implements PaymentService {
+
+    @Inject
+    @Delegate
+    PaymentService delegate;
+
+    public void pay(BigDecimal amount) {
+        System.out.println("Payment of " + amount);
+        delegate.pay(amount);
+    }
+}
+```
+
+When you inject `PaymentService`, the container returns the decorator. The decorator's `@Delegate` field receives the original bean:
+
+```java
+@Inject
+PaymentService paymentService; // returns LoggingPaymentDecorator
+
+@Inject
+CreditCardPaymentService directService; // returns the original bean
+```
+
+### 2.10.2 Decorator Chains
+
+Multiple decorators for the same interface are ordered by `@Priority` (lowest value = innermost, closest to the original bean):
+
+```java
+@Decorator @Priority(1000)
+public class LoggingDecorator implements PaymentService { ... }
+
+@Decorator @Priority(2000)
+public class SecurityDecorator implements PaymentService { ... }
+```
+
+Call chain: `SecurityDecorator → LoggingDecorator → CreditCardPaymentService`
+
+### 2.10.3 Limitations
+
+* Only interface-based decoration is supported — you cannot decorate a concrete class directly
+* Decorator classes must be managed beans (annotated with a scope such as `@ApplicationScoped`)
+* Each decorator must have exactly one `@Inject @Delegate` field
+
+## 2.11 BeanManager
 
 is a fundamental interface that provides access to the CDI container. It allows developers to programmatically interact with the CDI container to obtain beans or destroy them. This is especially useful in scenarios where dynamic lookup or programmatic interactions with the CDI container are required.
 
@@ -774,7 +840,7 @@ public class MyBean {
 }
 ```
 
-### 2.10.1 ManagedInstance and Instance
+### 2.11.1 ManagedInstance and Instance
 
 In the context of CDI Instance<T> is a part of the CDI API that provides a way to obtain instances of a certain bean type T dynamically at runtime. It acts as a programmatic client for beans;
 

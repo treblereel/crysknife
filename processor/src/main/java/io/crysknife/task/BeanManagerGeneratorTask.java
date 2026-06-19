@@ -216,6 +216,20 @@ public class BeanManagerGeneratorTask implements Task {
                         }
                       });
 
+                  if (!beanDefinition.getExcludedAssignableTypes().isEmpty()) {
+                    assignableTypes.removeIf(t -> beanDefinition.getExcludedAssignableTypes()
+                        .stream().anyMatch(excluded -> iocContext.getGenerationContext().getTypes()
+                            .isSameType(t, excluded)));
+                  }
+
+                  for (TypeMirror additional : beanDefinition.getAdditionalAssignableTypes()) {
+                    if (assignableTypes.stream().noneMatch(
+                        t -> iocContext.getGenerationContext().getTypes()
+                            .isSameType(t, additional))) {
+                      assignableTypes.add(additional);
+                    }
+                  }
+
                   MethodCallExpr registerCallExpr = new MethodCallExpr("register");
 
                   Expression builderCallExpr =
