@@ -1,0 +1,58 @@
+<div data-field="root">
+    <h4>@Decorator + @Delegate</h4>
+
+    <p>This demo shows CDI Decorators in action. The <code>UpperCaseGreeterDecorator</code> wraps
+       the <code>SimpleGreeter</code> bean. When you inject the <code>Greeter</code> interface,
+       you get the decorator which transforms the result to uppercase. Injecting the concrete
+       <code>SimpleGreeter</code> type bypasses the decorator.</p>
+
+    <span>Interface:</span>
+    <pre class="prettyprint lang-java">
+    public interface Greeter {\n
+        String greet(String name);\n
+    }\n
+    </pre>
+
+    <span>Original bean:</span>
+    <pre class="prettyprint lang-java">
+    @ApplicationScoped\n
+    public class SimpleGreeter implements Greeter {\n
+        public String greet(String name) {\n
+            return "Hello, " + name + "!";\n
+        }\n
+    }\n
+    </pre>
+
+    <span>Decorator:</span>
+    <pre class="prettyprint lang-java">
+    @ApplicationScoped\n
+    @Decorator\n
+    @Priority(1000)\n
+    public class UpperCaseGreeterDecorator implements Greeter {\n
+        @Inject @Delegate\n
+        Greeter delegate;\n
+    \n
+        public String greet(String name) {\n
+            return delegate.greet(name).toUpperCase();\n
+        }\n
+    }\n
+    </pre>
+
+    <div class="form-group">
+        <label class="control-label">Name:</label>
+        <input class="form-control" style="width: 300px;" data-field="nameInput" placeholder="World">
+    </div>
+
+    <div style="margin-top: 10px;">
+        <button class="btn btn-primary" data-field="greetBtn">greeter.greet(name) — via interface</button>
+        <button class="btn btn-default" data-field="directBtn">simpleGreeter.greet(name) — direct</button>
+    </div>
+
+    <div style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 4px;" data-field="resultOutput">
+        Decorated result will appear here
+    </div>
+
+    <div style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 4px;" data-field="directOutput">
+        Direct result will appear here
+    </div>
+</div>

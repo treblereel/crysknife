@@ -46,6 +46,7 @@ import io.crysknife.logger.TreeLogger;
 import io.crysknife.task.AfterBurnFactoryStepTask;
 import io.crysknife.task.BeanInfoGenerator;
 import io.crysknife.task.BeanProcessorTask;
+import io.crysknife.task.DecoratorProcessorTask;
 import io.crysknife.task.FactoryGeneratorTask;
 import io.crysknife.task.FireBeforeTask;
 import io.crysknife.task.IOCProviderTask;
@@ -117,6 +118,7 @@ public class ApplicationProcessor extends AbstractProcessor {
         taskGroup.addTask(new ProcessSubClassesTask(iocContext, logger));
         taskGroup.addTask(new ProcessGraphTask(iocContext, logger, application));
         taskGroup.addTask(new InterceptorBindingProcessorTask(iocContext, logger));
+        taskGroup.addTask(new DecoratorProcessorTask(iocContext, logger));
         taskGroup.addTask(new MethodParamDecoratorTask(iocContext, logger));
         taskGroup.addTask(new FactoryGeneratorTask(iocContext, logger));
         taskGroup.addTask(new BeanInfoGenerator(iocContext, logger));
