@@ -1,0 +1,59 @@
+<div data-field="root">
+    <h4>@InterceptorBinding + @AroundInvoke</h4>
+
+    <p>This demo shows Jakarta Interceptors in action. The <code>GreetingService</code> has methods
+       annotated with <code>@Logged</code> (a custom <code>@InterceptorBinding</code>).
+       The <code>LoggingInterceptor</code> intercepts those calls via <code>@AroundInvoke</code>.</p>
+
+    <span>Interceptor binding:</span>
+    <pre class="prettyprint lang-java">
+    @InterceptorBinding\n
+    @Retention(RetentionPolicy.RUNTIME)\n
+    @Target({ElementType.METHOD, ElementType.TYPE})\n
+    public @interface Logged {}\n
+    </pre>
+
+    <span>Interceptor:</span>
+    <pre class="prettyprint lang-java">
+    @ApplicationScoped\n
+    @Interceptor\n
+    @Logged\n
+    public class LoggingInterceptor {\n
+        @AroundInvoke\n
+        public Object intercept(InvocationContext ctx) throws Exception {\n
+            // before\n
+            Object result = ctx.proceed();\n
+            // after\n
+            return result;\n
+        }\n
+    }\n
+    </pre>
+
+    <span>Intercepted service:</span>
+    <pre class="prettyprint lang-java">
+    @ApplicationScoped\n
+    public class GreetingService {\n
+        @Logged\n
+        public String greet(String name) {\n
+            return "Hello, " + name + "!";\n
+        }\n
+    }\n
+    </pre>
+
+    <div class="form-group">
+        <label class="control-label">Name:</label>
+        <input class="form-control" style="width: 300px;" data-field="nameInput" placeholder="World">
+    </div>
+
+    <div style="margin-top: 10px;">
+        <button class="btn btn-primary" data-field="greetBtn">greet(name)</button>
+        <button class="btn btn-info" data-field="addBtn">add(3, 7)</button>
+        <button class="btn btn-default" data-field="noInterceptBtn">notIntercepted()</button>
+        <button class="btn btn-warning" data-field="clearBtn">Clear log</button>
+    </div>
+
+    <div style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 4px;" data-field="resultOutput"></div>
+
+    <label class="control-label" style="margin-top: 10px;">Interceptor log:</label>
+    <textarea class="form-control" rows="8" readonly data-field="logOutput" style="font-family: monospace; font-size: 12px;"></textarea>
+</div>

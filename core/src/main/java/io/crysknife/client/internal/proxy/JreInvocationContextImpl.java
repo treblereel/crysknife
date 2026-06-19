@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Treblereel
+ * Copyright © 2024 Treblereel
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -13,22 +13,23 @@
  */
 package io.crysknife.client.internal.proxy;
 
-import jsinterop.base.Js;
+import java.util.List;
 
-/**
- * @author Dmitrii Tikhomirov Created by treblereel 12/18/19
- */
-public final class ProxySetInterceptor implements SetFN {
+import io.crysknife.client.internal.GwtIncompatible;
 
-  private final Object target;
+@GwtIncompatible
+public class JreInvocationContextImpl extends InvocationContextImpl {
 
-  public ProxySetInterceptor(Object target) {
-    this.target = target;
+  private final java.lang.reflect.Method method;
+
+  public JreInvocationContextImpl(Object target, Object[] parameters,
+      List<AroundInvokeCallback> chain, AroundInvokeCallback terminalCall, java.lang.reflect.Method method) {
+    super(target, parameters, chain, terminalCall);
+    this.method = method;
   }
 
   @Override
-  public boolean onInvoke(Object object, String objectKey, Object value) {
-    Js.asPropertyMap(object).set(objectKey, value);
-    return true;
+  public java.lang.reflect.Method getMethod() {
+    return method;
   }
 }

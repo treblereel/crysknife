@@ -52,6 +52,10 @@
             <groupId>org.treblereel.gwt.jakarta</groupId>
             <artifactId>inject</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.treblereel.gwt.jakarta</groupId>
+            <artifactId>interceptors</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

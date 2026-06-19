@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Treblereel
+ * Copyright © 2024 Treblereel
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -11,24 +11,24 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.crysknife.client.internal.proxy;
+package io.crysknife.demo.client.interceptor;
 
-import jsinterop.base.Js;
+import jakarta.enterprise.context.ApplicationScoped;
 
-/**
- * @author Dmitrii Tikhomirov Created by treblereel 12/18/19
- */
-public final class ProxySetInterceptor implements SetFN {
+@ApplicationScoped
+public class GreetingService {
 
-  private final Object target;
-
-  public ProxySetInterceptor(Object target) {
-    this.target = target;
+  @Logged
+  public String greet(String name) {
+    return "Hello, " + name + "!";
   }
 
-  @Override
-  public boolean onInvoke(Object object, String objectKey, Object value) {
-    Js.asPropertyMap(object).set(objectKey, value);
-    return true;
+  @Logged
+  public int add(int a, int b) {
+    return a + b;
+  }
+
+  public String notIntercepted() {
+    return "This method is NOT intercepted";
   }
 }

@@ -15,8 +15,10 @@
 package io.crysknife.definition;
 
 import java.lang.annotation.Annotation;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -26,6 +28,7 @@ import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.inject.Alternative;
 import jakarta.inject.Singleton;
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.type.TypeMirror;
 
 import com.google.auto.common.MoreElements;
@@ -51,6 +54,8 @@ public class BeanDefinition implements Definition {
   private boolean hasFactory = true;
 
   private boolean factoryGenerationFinished = false;
+  private final Map<ExecutableElement, List<InterceptorInfo>> interceptedMethods =
+      new LinkedHashMap<>();
 
 
   public BeanDefinition(TypeMirror type) {
@@ -111,6 +116,10 @@ public class BeanDefinition implements Definition {
 
   public String getSimpleClassName() {
     return TypeUtils.getSimpleClassName(type);
+  }
+
+  public Map<ExecutableElement, List<InterceptorInfo>> getInterceptedMethods() {
+    return interceptedMethods;
   }
 
   public Set<IOCGenerator<BeanDefinition>> getDecorators() {

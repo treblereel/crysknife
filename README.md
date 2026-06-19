@@ -31,8 +31,12 @@
       - [2.8.1 @PostConstruct](#281-postconstruct)
       - [2.8.2 @PreDestroy](#282-predestroy)
       - [2.8.3 @Startup](#283-startup)
-    - [2.9 BeanManager](#29-beanmanager)
-      - [2.9.1 ManagedInstance and Instance](#291-managedinstance-and-instance)
+    - [2.9 Interceptors](#29-interceptors)
+      - [2.9.1 @InterceptorBinding](#291-interceptorbinding)
+      - [2.9.2 @AroundInvoke](#292-aroundinvoke)
+      - [2.9.3 Limitations](#293-limitations)
+    - [2.10 BeanManager](#210-beanmanager)
+      - [2.10.1 ManagedInstance and Instance](#2101-managedinstance-and-instance)
 - [3.0 UI Components](#30-ui-components)
 - [3.1. Basic templated bean](#31-basic-templated-bean)
 - [3.2. Custom template names](#32-custom-template-names)
@@ -190,7 +194,7 @@ How to compile and run your application and how to run development mode, please 
 
 ## 2.1. What is CDI?
 
-CDI stands for Contexts and Dependency Injection. Dependency Injection is a design pattern that allows us to remove the hard-coded dependencies and make our application loosely coupled, extendable and maintainable. Crysknife doesn't support decorators, interceptors and transactions. 
+CDI stands for Contexts and Dependency Injection. Dependency Injection is a design pattern that allows us to remove the hard-coded dependencies and make our application loosely coupled, extendable and maintainable. Crysknife doesn't support decorators and transactions. 
 
 tip: It's important to note that Crysknife provides lazy initialization of beans. It means that the bean is created only when it is needed.
 
@@ -644,7 +648,100 @@ public class MyBean {
 ```
 A bean, annotated with @Startup, must be a @ApplicationScoped/@Singleton bean. If it is not, the container will throw an exception.
 
-## 2.9 BeanManager
+## 2.9 Interceptors
+
+Crysknife supports Jakarta Interceptors, allowing you to intercept method invocations using `@InterceptorBinding` and `@AroundInvoke` annotations. In J2CL mode, interception is implemented via ES6 Proxy `get` traps. In JRE mode (for testing), AspectJ `@Around` advice is generated at compile time.
+
+### 2.9.1 @InterceptorBinding
+
+To create an interceptor, first define a custom interceptor binding annotation:
+
+```java
+@InterceptorBinding
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD, ElementType.TYPE})
+public @interface Logged {}
+```
+
+Then create the interceptor class annotated with `@Interceptor` and your binding annotation:
+
+```java
+@ApplicationScoped
+@Interceptor
+@Logged
+public class LoggingInterceptor {
+
+    @AroundInvoke
+    public Object intercept(InvocationContext ctx) throws Exception {
+        System.out.println("Before: " + ctx.getParameters().length + " args");
+        Object result = ctx.proceed();
+        System.out.println("After: result = " + result);
+        return result;
+    }
+}
+```
+
+### 2.9.2 @AroundInvoke
+
+Apply the interceptor binding annotation to individual methods or to the entire class. When applied to a class, all public non-static non-final business methods are intercepted.
+
+Method-level binding:
+
+```java
+@ApplicationScoped
+public class GreetingService {
+
+    @Logged
+    public String greet(String name) {
+        return "Hello, " + name + "!";
+    }
+
+    // This method is NOT intercepted
+    public String notIntercepted() {
+        return "No interception here";
+    }
+}
+```
+
+Class-level binding:
+
+```java
+@Logged
+@ApplicationScoped
+public class FullyInterceptedService {
+
+    // All public business methods are intercepted
+    public void doWork() { }
+
+    public String process(String input) {
+        return input.toUpperCase();
+    }
+}
+```
+
+The `InvocationContext` passed to the `@AroundInvoke` method provides:
+
+* `getTarget()` — the bean instance being intercepted
+* `getParameters()` — the method arguments (mutable array)
+* `setParameters(Object[])` — replace the method arguments before proceeding
+* `proceed()` — invoke the next interceptor in the chain or the original method
+* `getContextData()` — a `Map<String, Object>` for passing data between interceptors in the chain
+
+### 2.9.3 Limitations
+
+Because J2CL does not support `java.lang.reflect`, the following `InvocationContext` methods are **not available** and will throw `UnsupportedOperationException`:
+
+* `getMethod()` — cannot return `java.lang.reflect.Method` in J2CL
+* `getConstructor()` — cannot return `java.lang.reflect.Constructor` in J2CL
+
+These methods are marked `@GwtIncompatible` in the Jakarta Interceptors API and are stripped by the J2CL transpiler. They work normally in JRE mode (e.g., in unit tests with AspectJ).
+
+Additionally:
+* Only `public`, non-`static`, non-`final` methods can be intercepted
+* `@PostConstruct` and `@PreDestroy` lifecycle methods are excluded from interception
+* Interceptor classes must be managed beans (annotated with a scope such as `@ApplicationScoped`)
+
+## 2.10 BeanManager
 
 is a fundamental interface that provides access to the CDI container. It allows developers to programmatically interact with the CDI container to obtain beans or destroy them. This is especially useful in scenarios where dynamic lookup or programmatic interactions with the CDI container are required.
 
@@ -677,7 +774,7 @@ public class MyBean {
 }
 ```
 
-### 2.9.1 ManagedInstance and Instance
+### 2.10.1 ManagedInstance and Instance
 
 In the context of CDI Instance<T> is a part of the CDI API that provides a way to obtain instances of a certain bean type T dynamically at runtime. It acts as a programmatic client for beans;
 
