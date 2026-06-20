@@ -75,7 +75,7 @@
         <org.treblereel.j2cl.processors.version>0.10</org.treblereel.j2cl.processors.version>
 
 
-        <gwt.jakarta.version>0.7</gwt.jakarta.version>
+        <gwt.jakarta.version>0.8</gwt.jakarta.version>
         <j2cl.platform.version>20260527-1</j2cl.platform.version>
         <javaparser.core.version>3.28.2</javaparser.core.version>
         <auto.common.version>1.2.2</auto.common.version>
