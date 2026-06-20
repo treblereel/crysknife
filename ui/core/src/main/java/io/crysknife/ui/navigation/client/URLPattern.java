@@ -116,19 +116,6 @@ public class URLPattern {
     }
 
 
-    /*    while ((mr = re.exec(this.urlTemplate)) != null) {
-      String toReplace = mr.getGroup(0);
-      String key = mr.getGroup(1);
-      if (toReplace.contains(key)) {
-        // Encode all the characters we use to parse URLs.
-        String encodedValue = URLPattern.encodeParsingCharacters(state.get(key).iterator().next());
-        url = url.replace(toReplace, encodedValue);
-      } else {
-        throw new IllegalStateException(
-            "Path parameter list did not contain required parameter " + mr.getGroup(1));
-      }
-    }*/
-
     if (state.keySet().size() == paramList.size()) {
       return url;
     }

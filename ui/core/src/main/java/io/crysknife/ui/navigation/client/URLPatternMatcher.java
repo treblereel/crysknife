@@ -131,8 +131,7 @@ public class URLPatternMatcher {
       parseKeyValuePairs(keyValuePairs, mapBuilder);
     }
 
-    final Multimap<String, String> state = new Multimap<>();
-    return new HistoryToken(pageName, ImmutableMultimap.copyOf(state), getURLPattern(pageName));
+    return new HistoryToken(pageName, ImmutableMultimap.copyOf(mapBuilder), getURLPattern(pageName));
   }
 
   private String parseValues(String rawURIPath, Multimap<String, String> builder) {
@@ -141,7 +140,7 @@ public class URLPatternMatcher {
       return null;
 
     final URLPattern pattern = getURLPattern(pageName);
-    if (pattern.getParamList().size() == 0)
+    if (pattern.getParamList().isEmpty())
       return pageName;
 
     final RegExpResult mr = pattern.getRegex().exec(rawURIPath);
@@ -191,7 +190,7 @@ public class URLPatternMatcher {
       throw new IllegalArgumentException("Page " + defaultPage
           + " must be added to URLPatternMatcher before it can be set as Default Page.");
 
-    if (urlPattern.getParamList().size() > 0)
+    if (!urlPattern.getParamList().isEmpty())
       throw new IllegalArgumentException("Cannot set a default page that has path parameters.");
 
     this.defaultPageName = defaultPage;
@@ -210,7 +209,7 @@ public class URLPatternMatcher {
    * @return The name of the page to which the given user-entered URL corresponds.
    */
   public String getPageName(String typedURL) {
-    if (typedURL.equals("")) {
+    if (typedURL.isEmpty()) {
       return this.defaultPageName;
     }
     for (final Map.Entry<URLPattern, String> urlMatcher : pageMap.entrySet()) {
