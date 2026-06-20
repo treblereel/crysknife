@@ -139,9 +139,13 @@ public class TemplateGenerator extends IOCGenerator<BeanDefinition> {
 
         TemplateSelector templateSelector = templateParser.getTemplateSelector(type, templated);
 
-        String fqTemplate =
-                TypeSimplifier.packageNameOf(type).replace('.', '/') + "/" + templateSelector.template;
-        context.setTemplateFileName(fqTemplate);
+        if (templateSelector.inline) {
+            context.setTemplateFileName("<inline>");
+        } else {
+            String fqTemplate =
+                    TypeSimplifier.packageNameOf(type).replace('.', '/') + "/" + templateSelector.template;
+            context.setTemplateFileName(fqTemplate);
+        }
 
         org.jsoup.nodes.Element root = templateParser.parseTemplate(type, templateSelector);
         context.setRoot(templateParser.createRootElementInfo(root, type.toString()));
