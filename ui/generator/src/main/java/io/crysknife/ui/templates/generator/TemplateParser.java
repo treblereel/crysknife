@@ -59,20 +59,48 @@ public class TemplateParser {
     }
 
     TemplateSelector getTemplateSelector(TypeElement type, Templated templated) {
-        if (Strings.emptyToNull(templated.value()) == null) {
-            return new TemplateSelector(type.getSimpleName().toString() + ".html");
-        } else {
-            if (templated.value().contains("#")) {
-                Iterator<String> iterator = Splitter.on('#').limit(2).omitEmptyStrings().trimResults()
-                        .split(templated.value()).iterator();
-                return new TemplateSelector(iterator.next(), iterator.next());
-            } else {
-                return new TemplateSelector(templated.value());
-            }
+        boolean hasValue = Strings.emptyToNull(templated.value()) != null;
+        boolean hasInline = Strings.emptyToNull(templated.inline()) != null;
+
+        if (hasValue && hasInline) {
+            abortWithError(type,
+                    "@Templated must not specify both value() and inline() at the same time");
         }
+
+        if (hasInline) {
+            return TemplateSelector.ofInline(templated.inline());
+        }
+
+        if (!hasValue) {
+            return new TemplateSelector(type.getSimpleName().toString() + ".html");
+        }
+
+        if (templated.value().contains("#")) {
+            Iterator<String> iterator = Splitter.on('#').limit(2).omitEmptyStrings().trimResults()
+                    .split(templated.value()).iterator();
+            return new TemplateSelector(iterator.next(), iterator.next());
+        }
+        return new TemplateSelector(templated.value());
     }
 
     org.jsoup.nodes.Element parseTemplate(TypeElement type, TemplateSelector templateSelector) {
+        if (templateSelector.inline) {
+            return parseInlineTemplate(type, templateSelector.template);
+        }
+        return parseFileTemplate(type, templateSelector);
+    }
+
+    private org.jsoup.nodes.Element parseInlineTemplate(TypeElement type, String html) {
+        Document document = Jsoup.parse(html);
+        if (document.body() == null || document.body().children().isEmpty()) {
+            abortWithError(type, "No content found in inline template");
+            return null;
+        }
+        return document.body().children().first();
+    }
+
+    private org.jsoup.nodes.Element parseFileTemplate(TypeElement type,
+                                                      TemplateSelector templateSelector) {
         org.jsoup.nodes.Element root = null;
         String fqTemplate =
                 MoreElements.getPackage(type).getQualifiedName().toString().replace('.', '/') + "/"
