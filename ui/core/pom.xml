@@ -11,8 +11,8 @@
   <artifactId>crysknife-ui-core</artifactId>
   <packaging>jar</packaging>
 
-  <name>UI core components</name>
-  <description>UI core components</description>
+  <name>Crysknife :: UI :: Core</name>
+  <description>Templating, navigation, and i18n runtime library</description>
 
   <developers>
     <developer>

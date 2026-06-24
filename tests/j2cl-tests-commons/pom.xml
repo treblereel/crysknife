@@ -7,7 +7,8 @@
     <groupId>io.crysknife.tests</groupId>
     <artifactId>j2cl-tests-commons</artifactId>
     <version>0.10</version>
-    <description>J2CL integration tests for crysknife Trusted Types / SafeHtmlUtils</description>
+    <name>Crysknife :: Tests :: J2CL :: Commons</name>
+    <description>J2CL test common utilities</description>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

@@ -8,8 +8,8 @@
     <version>0.10</version>
     <packaging>pom</packaging>
 
-    <name>crysknife parent</name>
-    <description>POC DI for GWT 3 or j2cl</description>
+    <name>Crysknife</name>
+    <description>Jakarta CDI dependency injection framework for J2CL</description>
     <url>https://github.com/treblereel</url>
 
     <developers>

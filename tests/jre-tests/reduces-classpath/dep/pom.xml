@@ -8,6 +8,9 @@
     <version>0.10</version>
     <packaging>jar</packaging>
 
+    <name>Crysknife :: Tests :: JRE :: Reduced Classpath :: Dep</name>
+    <description>Reduced classpath test dependency</description>
+
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>

@@ -8,6 +8,9 @@
     <version>0.10</version>
     <packaging>pom</packaging>
 
+    <name>Crysknife :: Tests :: JRE :: Reduced Classpath</name>
+    <description>Reduced classpath test parent</description>
+
     <modules>
         <module>dep</module>
         <module>app</module>

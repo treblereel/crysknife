@@ -7,7 +7,8 @@
     <groupId>io.crysknife.tests</groupId>
     <artifactId>j2cl-tests</artifactId>
     <version>0.10</version>
-    <description>PatternFly Java integration test for crysknife @Templated / @DataField</description>
+    <name>Crysknife :: Tests :: J2CL</name>
+    <description>J2CL integration tests</description>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
