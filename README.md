@@ -35,8 +35,12 @@
       - [2.9.1 @InterceptorBinding](#291-interceptorbinding)
       - [2.9.2 @AroundInvoke](#292-aroundinvoke)
       - [2.9.3 Limitations](#293-limitations)
-    - [2.10 BeanManager](#210-beanmanager)
-      - [2.10.1 ManagedInstance and Instance](#2101-managedinstance-and-instance)
+    - [2.10 Decorators](#210-decorators)
+      - [2.10.1 @Decorator + @Delegate](#2101-decorator--delegate)
+      - [2.10.2 Decorator Chains](#2102-decorator-chains)
+      - [2.10.3 Limitations](#2103-limitations)
+    - [2.11 BeanManager](#211-beanmanager)
+      - [2.11.1 ManagedInstance and Instance](#2111-managedinstance-and-instance)
 - [3.0 UI Components](#30-ui-components)
 - [3.1. Basic templated bean](#31-basic-templated-bean)
 - [3.2. Custom template names](#32-custom-template-names)
@@ -54,6 +58,15 @@
   - [3.4.3. Page Roles](#343-page-roles)
   - [3.4.4. Page Lifecycle](#344-page-lifecycle)
   - [3.4.5. Following a Manual Link](#345-following-a-manual-link)
+- [3.5. Data Binding](#35-data-binding)
+  - [3.5.1. @Bindable Models](#351-bindable-models)
+  - [3.5.2. @Bound Fields](#352-bound-fields)
+  - [3.5.3. Nested Bean Properties (Dot-Notation)](#353-nested-bean-properties-dot-notation)
+  - [3.5.4. Programmatic Binding with DataBinder](#354-programmatic-binding-with-databinder)
+  - [3.5.5. Property Change Handlers](#355-property-change-handlers)
+  - [3.5.6. Collection Binding with ListComponent](#356-collection-binding-with-listcomponent)
+  - [3.5.7. Converters](#357-converters)
+  - [3.5.8. Limitations](#358-limitations)
 - [4. Contributing to Crysknife](#4-contributing-to-crysknife)
 - [5. Crysknife License](#5-crysknife-license)
 
@@ -1156,6 +1169,249 @@ public class WelcomePage implements IsElement {
 
 }
 ```
+
+## 3.5. Data Binding
+
+Crysknife provides a two-way data binding system that automatically synchronizes model properties with UI elements. When a user types into a bound input field, the model updates automatically. When the model changes programmatically, the UI reflects the new values. Inspired by Errai Data Binding.
+
+### 3.5.1. @Bindable Models
+
+To make a model class eligible for data binding, annotate it with `@Bindable`. The annotation processor generates a proxy subclass that intercepts setter calls and fires property change events.
+
+```java
+@Bindable
+@Dependent
+public class Contact {
+    private String name = "";
+    private String email = "";
+    private boolean active = true;
+    private Address address = new Address();
+    private List<String> tags = new ArrayList<>();
+
+    // Standard getters and setters required
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
+
+    public Address getAddress() { return address; }
+    public void setAddress(Address address) { this.address = address; }
+
+    public List<String> getTags() { return tags; }
+    public void setTags(List<String> tags) { this.tags = tags; }
+}
+```
+
+Requirements for `@Bindable` classes:
+* Must not be `final`
+* Must have a default (no-arg) constructor
+* Setters must not be `final` or `private`
+* Properties follow JavaBean convention (getter/setter pairs)
+
+### 3.5.2. @Bound Fields
+
+Use the `@Bound` annotation on `@DataField` elements in a `@Templated` bean to bind them to model properties. The `DataBinder` is injected and manages the binding lifecycle.
+
+```java
+@Singleton
+@Templated("contact-form.html")
+public class ContactForm implements IsElement<HTMLDivElement> {
+
+    @Inject
+    @DataField
+    HTMLDivElement root;
+
+    @Inject
+    DataBinder<Contact> binder;
+
+    @Inject
+    @DataField
+    @Bound(property = "name")
+    HTMLInputElement nameInput;
+
+    @Inject
+    @DataField
+    @Bound(property = "email")
+    HTMLInputElement emailInput;
+
+    @Inject
+    @DataField
+    @Bound
+    HTMLInputElement active;  // property name defaults to field name "active"
+
+    @EventHandler("saveBtn")
+    private void onSave(@ForEvent("click") MouseEvent event) {
+        Contact model = binder.getModel();
+        // model.getName() already contains the current input value
+    }
+
+    @Override
+    public HTMLDivElement getElement() { return root; }
+}
+```
+
+When `property` is not specified in `@Bound`, the field name is used as the property name.
+
+### 3.5.3. Nested Bean Properties (Dot-Notation)
+
+Bind to properties of nested beans using dot-notation. The nested bean must also be annotated with `@Bindable`:
+
+```java
+@Bindable
+@Dependent
+public class Address {
+    private String city = "";
+    private String zip = "";
+    // getters and setters
+}
+```
+
+```java
+@Inject
+@DataField
+@Bound(property = "address.city")
+HTMLInputElement cityInput;
+
+@Inject
+@DataField
+@Bound(property = "address.zip")
+HTMLInputElement zipInput;
+```
+
+Changes to `cityInput` will call `getModel().getAddress().setCity(...)` automatically, and calling `getModel().getAddress().setCity("Boston")` will update `cityInput`.
+
+### 3.5.4. Programmatic Binding with DataBinder
+
+In addition to declarative `@Bound` annotations, you can bind elements programmatically:
+
+```java
+@Inject
+DataBinder<Contact> binder;
+
+@Inject
+@DataField
+HTMLInputElement phoneInput;
+
+@PostConstruct
+public void init() {
+    binder.bind(phoneInput, "phone");
+}
+```
+
+Key `DataBinder` methods:
+
+```java
+// Set or replace the model — all bound UI elements update immediately
+binder.setModel(contact);
+
+// Get the current (proxied) model — reflects latest UI input values
+Contact model = binder.getModel();
+
+// Bind / unbind programmatically
+binder.bind(element, "propertyName");
+binder.unbind("propertyName");
+binder.unbind();  // unbind all
+```
+
+### 3.5.5. Property Change Handlers
+
+Listen for property changes on the model. Handlers fire whenever a bound property changes, whether from user input or programmatic updates:
+
+```java
+// Listen to all properties
+binder.addPropertyChangeHandler(event -> {
+    System.out.println(event.getPropertyName() + ": "
+        + event.getOldValue() + " -> " + event.getNewValue());
+});
+
+// Listen to a specific property
+PropertyChangeUnsubscribeHandle handle =
+    binder.addPropertyChangeHandler("name", event -> {
+        validateName(event.getNewValue());
+    });
+
+// Unsubscribe when no longer needed
+handle.unsubscribe();
+```
+
+### 3.5.6. Collection Binding with ListComponent
+
+`ListComponent<M>` automatically renders list items as child DOM elements. When bound to an `ObservableList` property, it re-renders whenever items are added or removed.
+
+Basic usage with default renderer (uses `toString()`):
+
+```java
+@DataField
+@Bound(property = "tags")
+ListComponent<String> tagsList = ListComponent.simple("ul", "li");
+```
+
+Custom renderer:
+
+```java
+@DataField
+@Bound(property = "tags")
+ListComponent<String> tagsList = ListComponent.create("ul", "li",
+    (tag, el) -> {
+        el.textContent = tag;
+        el.classList.add("badge");
+    });
+```
+
+The `ListComponent` implements `IsElement` so it integrates with `@DataField` as a template element replacement. No `@Inject` is needed — the field initializer creates the component.
+
+Mutations on the list are tracked automatically via `ObservableList`:
+
+```java
+// These mutations trigger automatic re-rendering
+binder.getModel().getTags().add("new-tag");
+binder.getModel().getTags().remove(0);
+```
+
+### 3.5.7. Converters
+
+Use a `Converter` to transform values between the model and the UI widget. For example, converting between an integer model property and the string value of an input element:
+
+```java
+public class IntegerConverter implements Converter<Integer, String> {
+    @Override
+    public Integer toModelValue(String widgetValue) {
+        return widgetValue.isEmpty() ? 0 : Integer.parseInt(widgetValue);
+    }
+
+    @Override
+    public String toWidgetValue(Integer modelValue) {
+        return String.valueOf(modelValue);
+    }
+}
+```
+
+Apply via annotation:
+
+```java
+@Inject
+@DataField
+@Bound(property = "age", converter = IntegerConverter.class)
+HTMLInputElement ageInput;
+```
+
+Or programmatically:
+
+```java
+binder.bind(ageInput, "age", new IntegerConverter());
+```
+
+### 3.5.8. Limitations
+
+* `@Bindable` classes must not be `final`
+* Setters must not be `final` or `private`
+* Array-typed properties are not supported — use `List` instead
+* `ListComponent` re-renders the full list on each mutation (no fine-grained DOM diffing)
+* Circular references in `@Bindable` models are not supported
 
 # 4. Contributing to Crysknife
 
