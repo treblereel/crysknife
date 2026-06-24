@@ -7,7 +7,8 @@
     <groupId>io.crysknife.tests</groupId>
     <artifactId>j2cl-tests-custom-policy</artifactId>
     <version>0.10</version>
-    <description>J2CL tests for configurable TrustedTypePolicy name via defines</description>
+    <name>Crysknife :: Tests :: J2CL :: Custom Policy</name>
+    <description>J2CL tests for TrustedTypes custom policy</description>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

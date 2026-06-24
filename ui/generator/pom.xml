@@ -9,8 +9,8 @@
   </parent>
 
   <artifactId>crysknife-ui-generator</artifactId>
-  <name>UI generators</name>
-  <description>UI generators</description>
+  <name>Crysknife :: UI :: Generator</name>
+  <description>Annotation processor for @Templated and navigation code generation</description>
   <packaging>jar</packaging>
 
   <developers>

@@ -10,8 +10,8 @@
   <artifactId>crysknife-core</artifactId>
   <packaging>jar</packaging>
 
-  <name>crysknife core</name>
-  <description>This artifact contains core components for crysknife</description>
+  <name>Crysknife :: Core</name>
+  <description>Runtime library with BeanManager, factories, and event system</description>
   <url>https://github.com/treblereel</url>
 
   <developers>

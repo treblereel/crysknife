@@ -10,8 +10,8 @@
     <packaging>pom</packaging>
 
 
-    <name>BOM (Bill Of Materials)</name>
-    <description>POC DI for GWT 3 or j2cl</description>
+    <name>Crysknife :: BOM</name>
+    <description>Bill of Materials for crysknife artifact versions</description>
     <url>https://github.com/treblereel</url>
 
     <developers>

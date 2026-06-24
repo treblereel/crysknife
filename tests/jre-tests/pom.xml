@@ -7,6 +7,7 @@
     <version>0.10</version>
     <packaging>pom</packaging>
     <name>Crysknife :: Tests :: JRE</name>
+    <description>JRE-based test modules parent</description>
 
     <modules>
         <module>cdi</module>

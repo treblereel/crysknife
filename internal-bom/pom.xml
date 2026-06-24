@@ -10,8 +10,8 @@
     <packaging>pom</packaging>
 
 
-    <name>Internal BOM (Bill Of Materials)</name>
-    <description>POC DI for GWT 3 or j2cl</description>
+    <name>Crysknife :: Internal BOM</name>
+    <description>Internal Bill of Materials for third-party dependency versions</description>
     <url>https://github.com/treblereel</url>
 
     <developers>

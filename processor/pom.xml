@@ -9,8 +9,8 @@
   </parent>
 
   <artifactId>crysknife-processor</artifactId>
-  <name>apt processor for crysknife-annotations project</name>
-  <description>apt processor for crysknife-annotations project</description>
+  <name>Crysknife :: Processor</name>
+  <description>Annotation processor for compile-time DI code generation</description>
   <packaging>jar</packaging>
 
   <developers>

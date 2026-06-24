@@ -10,8 +10,8 @@
 
   <groupId>io.crysknife.ui</groupId>
   <artifactId>parent</artifactId>
-  <name>UI parent</name>
-  <description>UI parent</description>
+  <name>Crysknife :: UI</name>
+  <description>UI modules parent</description>
   <packaging>pom</packaging>
 
   <developers>
