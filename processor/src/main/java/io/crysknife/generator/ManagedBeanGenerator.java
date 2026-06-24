@@ -209,6 +209,8 @@ public class ManagedBeanGenerator extends IOCGenerator<BeanDefinition> {
     protected void fieldDecorators(BeanDefinition beanDefinition, ClassMetaInfo classMetaInfo) {
         beanDefinition.getFields()
                 .forEach(field -> field.getDecorators().forEach(g -> g.generate(classMetaInfo, field)));
+        beanDefinition.getDecoratedFields()
+                .forEach(field -> field.getDecorators().forEach(g -> g.generate(classMetaInfo, field)));
     }
 
     protected void deps(BeanDefinition beanDefinition, List<Dep> fields) {

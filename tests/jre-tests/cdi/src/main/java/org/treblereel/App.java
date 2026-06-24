@@ -20,6 +20,8 @@ import jakarta.inject.Inject;
 
 import io.crysknife.annotation.Application;
 import io.crysknife.client.BeanManager;
+import io.crysknife.ui.databinding.api.DataBinder;
+import org.treblereel.databinding.UserModel;
 import org.treblereel.decorator.Greeter;
 import org.treblereel.decorator.LoggingGreeterDecorator;
 import org.treblereel.decorator.SimpleGreeter;
@@ -160,6 +162,9 @@ public class App {
 
   @Inject
   public LoggingInterceptor loggingInterceptor;
+
+  @Inject
+  public DataBinder<UserModel> userBinder;
 
   public void onModuleLoad() {
     new AppBootstrap(this).initialize();

@@ -63,6 +63,16 @@
     </dependency>
 
     <dependency>
+      <groupId>io.crysknife.ui</groupId>
+      <artifactId>crysknife-ui-databinding-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.crysknife.ui</groupId>
+      <artifactId>crysknife-ui-databinding-generator</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.treblereel.j2cl.processors</groupId>
       <artifactId>annotations</artifactId>
       <version>${org.treblereel.j2cl.processors.version}</version>

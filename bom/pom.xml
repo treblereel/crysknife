@@ -89,6 +89,18 @@
                 <artifactId>crysknife-ui-generator</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>io.crysknife.ui</groupId>
+                <artifactId>crysknife-ui-databinding-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.crysknife.ui</groupId>
+                <artifactId>crysknife-ui-databinding-generator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
