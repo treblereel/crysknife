@@ -154,9 +154,12 @@ public class DataFieldGenerator {
 
             boolean isElemento =
                     element.getKind() == DataElementInfo.Kind.ElementoIsElement;
+            boolean isCrysknifeIsElement =
+                    element.getKind() == DataElementInfo.Kind.IsElement;
             io.crysknife.ui.templates.generator.dto.Element elementDto =
                     new io.crysknife.ui.templates.generator.dto.Element(element.getSelector(), mangleName,
-                            element.getType().toString(), element.needsCast(), isElemento);
+                            element.getType().toString(), element.needsCast(), isElemento,
+                            isCrysknifeIsElement);
 
             templateDefinition.getElements().add(elementDto);
         }

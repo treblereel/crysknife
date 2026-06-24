@@ -51,6 +51,7 @@ public class BeanDefinition implements Definition {
   private final Set<BeanDefinition> dependencies = new LinkedHashSet<>();
   private final Set<IOCGenerator<BeanDefinition>> decorators = new LinkedHashSet<>();
   private Optional<IOCGenerator<BeanDefinition>> iocGenerator = Optional.empty();
+  private final Set<VariableDefinition> decoratedFields = new LinkedHashSet<>();
   private final Set<BeanDefinition> subclasses = new LinkedHashSet<>();
   private boolean hasFactory = true;
 
@@ -72,6 +73,10 @@ public class BeanDefinition implements Definition {
 
   public Set<InjectableVariableDefinition> getFields() {
     return fields;
+  }
+
+  public Set<VariableDefinition> getDecoratedFields() {
+    return decoratedFields;
   }
 
   public Set<InjectionParameterDefinition> getConstructorParams() {

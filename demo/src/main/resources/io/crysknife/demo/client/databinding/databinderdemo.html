@@ -1,0 +1,66 @@
+<div data-field="root">
+    <h4>DataBinder — Two-Way Data Binding</h4>
+
+    <p>This demo shows <code>@Bindable</code> models with <strong>primitive types</strong>,
+       <strong>nested beans</strong> (dot-notation), and <strong>collections</strong> (ObservableList).
+       Type in the inputs to update the model; click <strong>Load Sample</strong> to
+       update inputs from the model programmatically.</p>
+
+    <!-- Simple Properties -->
+    <h5>Simple Properties</h5>
+
+    <div class="form-group">
+        <label class="control-label">Name:</label>
+        <input class="form-control" style="width: 300px;" data-field="nameInput" placeholder="Enter name">
+    </div>
+
+    <div class="form-group">
+        <label class="control-label">Email:</label>
+        <input class="form-control" style="width: 300px;" data-field="emailInput" placeholder="Enter email">
+    </div>
+
+    <div class="form-group">
+        <label class="control-label" style="display: inline;">
+            <input type="checkbox" data-field="active"> Active
+        </label>
+    </div>
+
+    <!-- Nested Bean -->
+    <h5>Nested Bean (Address — dot-notation)</h5>
+    <span>Bound with <code>@Bound(property = "address.city")</code> and <code>@Bound(property = "address.zip")</code></span>
+
+    <div class="form-group">
+        <label class="control-label">City:</label>
+        <input class="form-control" style="width: 300px;" data-field="cityInput" placeholder="Enter city">
+    </div>
+
+    <div class="form-group">
+        <label class="control-label">Zip:</label>
+        <input class="form-control" style="width: 200px;" data-field="zipInput" placeholder="Enter zip">
+    </div>
+
+    <!-- Collections -->
+    <h5>Collection (List&lt;String&gt; tags)</h5>
+    <span>Bound with <code>ListComponent&lt;String&gt;</code> — mutations via <code>ObservableList</code> re-render automatically.</span>
+
+    <div style="margin-top: 5px;">
+        <label class="control-label">Tags:</label>
+        <ul style="padding-left: 20px; background: #eef; border-radius: 4px; min-height: 24px; margin: 0;" data-field="tagsList"></ul>
+    </div>
+
+    <div class="form-group" style="margin-top: 5px;">
+        <input class="form-control" style="width: 200px; display: inline-block;" data-field="tagInput" placeholder="New tag">
+        <button class="btn btn-success btn-sm" data-field="addTagBtn">Add Tag</button>
+        <button class="btn btn-warning btn-sm" data-field="removeTagBtn">Remove Last</button>
+    </div>
+
+    <!-- Controls -->
+    <div style="margin-top: 15px;">
+        <button class="btn btn-primary" data-field="loadBtn">Load Sample</button>
+        <button class="btn btn-default" data-field="clearBtn">Clear</button>
+    </div>
+
+    <div style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 4px;" data-field="modelState">
+        Model state will appear here
+    </div>
+</div>

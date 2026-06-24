@@ -3,15 +3,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>io.crysknife</groupId>
-    <artifactId>crysknife-parent</artifactId>
+    <groupId>io.crysknife.ui</groupId>
+    <artifactId>parent</artifactId>
     <version>0.10</version>
   </parent>
 
-  <groupId>io.crysknife.ui</groupId>
-  <artifactId>parent</artifactId>
-  <name>Crysknife :: UI</name>
-  <description>UI modules parent</description>
+  <artifactId>crysknife-ui-databinding-parent</artifactId>
+  <name>Crysknife :: UI :: DataBinding</name>
+  <description>Two-way data binding between Java models and UI elements</description>
   <packaging>pom</packaging>
 
   <developers>
@@ -21,12 +20,6 @@
       <email>chani.liet@gmail.com</email>
     </developer>
   </developers>
-
-  <modules>
-    <module>core</module>
-    <module>generator</module>
-    <module>databinding</module>
-  </modules>
 
   <licenses>
     <license>
@@ -40,5 +33,10 @@
     <name>Treblereel</name>
     <url>https://github.com/treblereel</url>
   </organization>
+
+  <modules>
+    <module>api</module>
+    <module>generator</module>
+  </modules>
 
 </project>
