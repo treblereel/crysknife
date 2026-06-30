@@ -101,6 +101,18 @@
                 <artifactId>crysknife-ui-databinding-generator</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>io.crysknife.ui</groupId>
+                <artifactId>crysknife-ui-rest-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.crysknife.ui</groupId>
+                <artifactId>crysknife-ui-rest-generator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
