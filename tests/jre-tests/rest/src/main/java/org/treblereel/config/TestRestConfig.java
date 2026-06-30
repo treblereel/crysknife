@@ -15,19 +15,20 @@
 package org.treblereel.config;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.Alternative;
 import jakarta.enterprise.inject.Produces;
+import jakarta.enterprise.inject.Specializes;
 
 import org.treblereel.gwt.rest.client.RestConfig;
 import org.treblereel.transport.JdkTransport;
 
-@Alternative
 @ApplicationScoped
-public class TestRestConfig {
+@Specializes
+public class TestRestConfig extends io.crysknife.ui.rest.DefaultRestConfig {
 
     public static String BASE_URL = "http://localhost:8080";
 
     @Produces
+    @Override
     public RestConfig restConfig() {
         return RestConfig.builder()
                 .baseUrl(BASE_URL)
