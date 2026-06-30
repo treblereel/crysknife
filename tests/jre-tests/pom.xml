@@ -13,6 +13,7 @@
         <module>cdi</module>
         <module>simple</module>
         <module>reduces-classpath</module>
+        <module>rest</module>
     </modules>
 
     <build>
