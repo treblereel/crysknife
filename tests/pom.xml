@@ -21,5 +21,6 @@
     <module>j2cl-tests</module>
     <module>j2cl-tests-commons</module>
     <module>j2cl-tests-custom-policy</module>
+    <module>j2cl-tests-rest</module>
   </modules>
 </project>
