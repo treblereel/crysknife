@@ -17,19 +17,26 @@
   limitations under the License.
   #L%
   -->
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
     <head>
-        <title>J2CL</title>
+        <title>Crysknife — Jakarta CDI for J2CL</title>
+        <meta charset="UTF-8">
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
         <meta http-equiv="Content-Security-Policy"
               content="require-trusted-types-for 'script'; trusted-types crysknife">
 
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-        <link rel="stylesheet" href="css/app.css">
+        <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6.5.2/patternfly.min.css">
         <link rel="stylesheet" href="css/desert.css">
+        <link rel="stylesheet" href="css/app.css">
 
-        <script language='javascript' src='demo.js' defer></script>
+        <script src='demo.js' defer></script>
+        <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js" defer></script>
+        <script defer>
+            window.addEventListener('hashchange', function() {
+                setTimeout(function() { if (typeof prettyPrint === 'function') prettyPrint(); }, 100);
+            });
+        </script>
     </head>
     <body></body>
 </html>
