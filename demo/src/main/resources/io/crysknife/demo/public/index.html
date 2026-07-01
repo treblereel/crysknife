@@ -35,7 +35,8 @@
         <script defer>
             document.addEventListener('DOMContentLoaded', function() {
                 new MutationObserver(function() {
-                    if (document.querySelector('pre.prettyprint:not(.prettyprinted)')) {
+                    if (typeof prettyPrint === 'function'
+                        && document.querySelector('pre.prettyprint:not(.prettyprinted)')) {
                         prettyPrint();
                     }
                 }).observe(document.body, { childList: true, subtree: true });
