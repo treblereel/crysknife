@@ -17,13 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 
 import elemental2.dom.HTMLButtonElement;
 import elemental2.dom.HTMLDivElement;
 import elemental2.dom.MouseEvent;
 import io.crysknife.client.IsElement;
+import io.crysknife.client.ManagedInstance;
 import io.crysknife.ui.navigation.client.annotation.Page;
 import io.crysknife.ui.templates.client.annotation.DataField;
 import io.crysknife.ui.templates.client.annotation.EventHandler;
@@ -52,7 +52,7 @@ public class ProviderDemo implements IsElement<HTMLDivElement> {
   HTMLButtonElement clearBtn;
 
   @Inject
-  Provider<ExpensiveService> provider;
+  ManagedInstance<ExpensiveService> provider;
 
   private final List<Integer> instanceIds = new ArrayList<>();
 
