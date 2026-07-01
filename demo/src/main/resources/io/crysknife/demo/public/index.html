@@ -33,8 +33,12 @@
         <script src='demo.js' defer></script>
         <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js" defer></script>
         <script defer>
-            window.addEventListener('hashchange', function() {
-                setTimeout(function() { if (typeof prettyPrint === 'function') prettyPrint(); }, 100);
+            document.addEventListener('DOMContentLoaded', function() {
+                new MutationObserver(function() {
+                    if (document.querySelector('pre.prettyprint:not(.prettyprinted)')) {
+                        prettyPrint();
+                    }
+                }).observe(document.body, { childList: true, subtree: true });
             });
         </script>
     </head>
