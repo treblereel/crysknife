@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Treblereel
+ * Copyright © 2026 Treblereel
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -12,28 +12,35 @@
  * the License.
  */
 
-package org.treblereel.config;
+package io.crysknife.tests.rest.client;
 
-import io.crysknife.ui.rest.DefaultRestConfig;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
-import jakarta.enterprise.inject.Specializes;
+import jakarta.inject.Named;
 
 import org.treblereel.gwt.rest.client.RestConfig;
-import org.treblereel.transport.JdkTransport;
 
 @ApplicationScoped
-@Specializes
-public class TestRestConfig extends DefaultRestConfig {
-
-    public static String BASE_URL = "http://localhost:8080";
+public class JsonPlaceholderConfig {
 
     @Produces
-    @Override
-    public RestConfig restConfig() {
+    public RestConfig defaultRestConfig() {
+        return RestConfig.builder().build();
+    }
+
+    @Produces
+    @Named("jsonplaceholder")
+    public RestConfig jsonPlaceholderRestConfig() {
         return RestConfig.builder()
-                .baseUrl(BASE_URL)
-                .transport(new JdkTransport())
+                .baseUrl("https://jsonplaceholder.typicode.com")
+                .build();
+    }
+
+    @Produces
+    @ExternalApi
+    public RestConfig externalApiRestConfig() {
+        return RestConfig.builder()
+                .baseUrl("https://jsonplaceholder.typicode.com")
                 .build();
     }
 }

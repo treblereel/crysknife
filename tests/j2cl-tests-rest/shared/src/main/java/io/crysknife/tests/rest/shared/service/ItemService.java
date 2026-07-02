@@ -17,11 +17,14 @@ import java.util.List;
 
 import io.crysknife.tests.rest.shared.model.Item;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 
 @Path("/api/items")
@@ -40,4 +43,20 @@ public interface ItemService {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   Item createItem(Item item);
+
+  @PUT
+  @Path("/{id}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  Item updateItem(@PathParam("id") long id, Item item);
+
+  @DELETE
+  @Path("/{id}")
+  @Produces(MediaType.APPLICATION_JSON)
+  Item deleteItem(@PathParam("id") long id);
+
+  @GET
+  @Path("/search")
+  @Produces(MediaType.APPLICATION_JSON)
+  List<Item> searchItems(@QueryParam("name") String name);
 }

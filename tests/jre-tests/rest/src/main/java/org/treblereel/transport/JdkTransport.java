@@ -24,6 +24,7 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +54,7 @@ public class JdkTransport implements RestTransport {
             if (request.getBody() != null && !request.getBody().isEmpty()) {
                 conn.setDoOutput(true);
                 try (OutputStream os = conn.getOutputStream()) {
-                    os.write(request.getBody().getBytes("UTF-8"));
+                    os.write(request.getBody().getBytes(StandardCharsets.UTF_8));
                 }
             }
 
@@ -119,6 +120,6 @@ public class JdkTransport implements RestTransport {
         while ((length = is.read(buffer)) != -1) {
             result.write(buffer, 0, length);
         }
-        return result.toString("UTF-8");
+        return result.toString(StandardCharsets.UTF_8);
     }
 }
