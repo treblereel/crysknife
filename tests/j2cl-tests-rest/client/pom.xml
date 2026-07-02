@@ -130,7 +130,7 @@
                 <configuration>
                     <webappDirectory>${project.build.directory}/j2cl/launcherDir</webappDirectory>
                     <initialScriptFilename>app.js</initialScriptFilename>
-                    <compilationLevel>ADVANCED</compilationLevel>
+                    <compilationLevel>SIMPLE</compilationLevel>
                     <annotationProcessorMode>IGNORE_MAVEN</annotationProcessorMode>
                 </configuration>
             </plugin>
