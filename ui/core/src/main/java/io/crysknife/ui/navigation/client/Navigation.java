@@ -129,10 +129,14 @@ public class Navigation {
     }
 
     private void processToken(String raw) {
-        HistoryToken token = historyTokenFactory.parseURL(raw);
-        if (currentNode == null || !token.equals(currentToken)) {
-            PageNode<Object> toPage = navGraph.getPage(token.getPageName());
-            navigate(new Request<>(toPage, token), false);
+        try {
+            HistoryToken token = historyTokenFactory.parseURL(raw);
+            if (currentNode == null || !token.equals(currentToken)) {
+                PageNode<Object> toPage = navGraph.getPage(token.getPageName());
+                navigate(new Request<>(toPage, token), false);
+            }
+        } catch (final RuntimeException e) {
+            navigationErrorHandler.handleInvalidURLError(e, raw);
         }
     }
 

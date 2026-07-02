@@ -222,6 +222,17 @@ public class NavigationGraphGenerator {
 
         ctor.getBody().addStatement(new MethodCallExpr(new NameExpr("pagesByName"), "put")
                 .addArgument(new StringLiteralExpr(pageName)).addArgument(toLowerCase(page)));
+
+        for (String role : annotatedPageRoles) {
+            if (!role.equals(DefaultPage.class.getCanonicalName())) {
+                String simpleRoleName = role.substring(role.lastIndexOf('.') + 1);
+                compilationUnit.addImport(role);
+                ctor.getBody()
+                        .addStatement(new MethodCallExpr(new NameExpr("pagesByRole"), "put")
+                                .addArgument(new NameExpr(simpleRoleName + ".class"))
+                                .addArgument(toLowerCase(page)));
+            }
+        }
     }
 
     private boolean isAssignable(TypeMirror subType, Class<?> baseType) {
