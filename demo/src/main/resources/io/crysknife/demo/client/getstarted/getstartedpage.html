@@ -1,0 +1,110 @@
+<div class="pf-v6-c-page__main-section" data-field="root">
+  <div class="pf-v6-c-content">
+    <h2>Getting Started</h2>
+    <p>Add Crysknife dependencies to your project and bootstrap the DI container.</p>
+
+    <h3>Download Starter Projects</h3>
+    <p>Get a ready-to-use project template with all dependencies and build configuration pre-configured.</p>
+    <div style="display: grid; grid-template-columns: 1fr; gap: 1rem; max-width: 600px;">
+      <div class="pf-v6-c-card">
+        <div class="pf-v6-c-card__title">
+          <h4 class="pf-v6-c-card__title-text">Single Module</h4>
+        </div>
+        <div class="pf-v6-c-card__body">
+          A minimal Hello World application with a single Maven module. Best for small projects and learning.
+        </div>
+        <div class="pf-v6-c-card__footer">
+          <button class="pf-v6-c-button pf-m-primary" data-field="downloadSingle" type="button">
+            Download .zip
+          </button>
+        </div>
+      </div>
+      <div class="pf-v6-c-card">
+        <div class="pf-v6-c-card__title">
+          <h4 class="pf-v6-c-card__title-text">Multi Module</h4>
+        </div>
+        <div class="pf-v6-c-card__body">
+          A Todo app with shared and client modules. Recommended for production projects with server-side code.
+        </div>
+        <div class="pf-v6-c-card__footer">
+          <button class="pf-v6-c-button pf-m-primary" data-field="downloadMulti" type="button">
+            Download .zip
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <h3>1. Add Maven Dependencies</h3>
+    <div class="ck-getting-started__grid">
+      <div class="ck-code-block">
+        <div class="ck-code-block__tab">pom.xml</div>
+        <pre>&lt;dependency&gt;\n
+  &lt;groupId&gt;io.crysknife&lt;/groupId&gt;\n
+  &lt;artifactId&gt;crysknife-core&lt;/artifactId&gt;\n
+  &lt;version&gt;0.10&lt;/version&gt;\n
+&lt;/dependency&gt;\n
+\n
+&lt;dependency&gt;\n
+  &lt;groupId&gt;io.crysknife&lt;/groupId&gt;\n
+  &lt;artifactId&gt;crysknife-processor&lt;/artifactId&gt;\n
+  &lt;version&gt;0.10&lt;/version&gt;\n
+  &lt;scope&gt;provided&lt;/scope&gt;\n
+&lt;/dependency&gt;\n</pre>
+      </div>
+    </div>
+
+    <h3>2. Create the Application Entry Point</h3>
+    <div class="ck-getting-started__grid">
+      <div class="ck-code-block">
+        <div class="ck-code-block__tab">App.java</div>
+        <pre>@Application\n
+public class App {\n
+\n
+  @Inject\n
+  private MyComponent component;\n
+\n
+  @GWT3EntryPoint\n
+  public void onModuleLoad() {\n
+    new AppBootstrap(this).initialize();\n
+  }\n
+\n
+  @PostConstruct\n
+  public void init() {\n
+    DomGlobal.document.body.appendChild(\n
+        component.getElement());\n
+  }\n
+}\n</pre>
+      </div>
+    </div>
+
+    <h3>3. Create a Component</h3>
+    <div class="ck-getting-started__grid">
+      <div class="ck-code-block">
+        <div class="ck-code-block__tab">MyComponent.java</div>
+        <pre>@Singleton\n
+@Templated("mycomponent.html")\n
+public class MyComponent\n
+    implements IsElement&lt;HTMLDivElement&gt; {\n
+\n
+  @Inject @DataField\n
+  HTMLDivElement root;\n
+\n
+  @Override\n
+  public HTMLDivElement getElement() {\n
+    return root;\n
+  }\n
+}\n</pre>
+      </div>
+      <div class="ck-code-block">
+        <div class="ck-code-block__tab">mycomponent.html</div>
+        <pre>&lt;div data-field="root"&gt;\n
+  &lt;h1&gt;Hello, Crysknife!&lt;/h1&gt;\n
+&lt;/div&gt;\n</pre>
+      </div>
+    </div>
+
+    <p style="margin-top: 2rem;">
+      <a class="pf-v6-c-button pf-m-primary" href="https://github.com/crysknife-io/crysknife" target="_blank">View on GitHub</a>
+    </p>
+  </div>
+</div>

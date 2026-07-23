@@ -1,19 +1,20 @@
-<div data-field="root">
-    <h4>@Decorator + @Delegate</h4>
+<div data-field="root" class="pf-v6-c-page__main-section">
+  <div class="pf-v6-c-content">
+    <h2>@Decorator + @Delegate</h2>
 
     <p>This demo shows CDI Decorators in action. The <code>UpperCaseGreeterDecorator</code> wraps
        the <code>SimpleGreeter</code> bean. When you inject the <code>Greeter</code> interface,
        you get the decorator which transforms the result to uppercase. Injecting the concrete
        <code>SimpleGreeter</code> type bypasses the decorator.</p>
 
-    <span>Interface:</span>
+    <h4>Interface:</h4>
     <pre class="prettyprint lang-java">
     public interface Greeter {\n
         String greet(String name);\n
     }\n
     </pre>
 
-    <span>Original bean:</span>
+    <h4>Original bean:</h4>
     <pre class="prettyprint lang-java">
     @ApplicationScoped\n
     public class SimpleGreeter implements Greeter {\n
@@ -23,7 +24,7 @@
     }\n
     </pre>
 
-    <span>Decorator:</span>
+    <h4>Decorator:</h4>
     <pre class="prettyprint lang-java">
     @ApplicationScoped\n
     @Decorator\n
@@ -38,21 +39,22 @@
     }\n
     </pre>
 
-    <div class="form-group">
-        <label class="control-label">Name:</label>
-        <input class="form-control" style="width: 300px;" data-field="nameInput" placeholder="World">
+    <div class="pf-v6-c-form__group">
+        <label class="pf-v6-c-form__label">Name:</label>
+        <input class="pf-v6-c-form-control" style="width: 300px;" data-field="nameInput" placeholder="World">
     </div>
 
-    <div style="margin-top: 10px;">
-        <button class="btn btn-primary" data-field="greetBtn">greeter.greet(name) — via interface</button>
-        <button class="btn btn-default" data-field="directBtn">simpleGreeter.greet(name) — direct</button>
+    <div style="margin-top: 12px;">
+        <button class="pf-v6-c-button pf-m-primary pf-m-small" data-field="greetBtn">greeter.greet(name) — via interface</button>
+        <button class="pf-v6-c-button pf-m-secondary pf-m-small" data-field="directBtn">simpleGreeter.greet(name) — direct</button>
     </div>
 
-    <div style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 4px;" data-field="resultOutput">
+    <div style="margin-top: 12px; padding: 12px; background: var(--pf-t--global--background--color--secondary--default); border-radius: 4px;" data-field="resultOutput">
         Decorated result will appear here
     </div>
 
-    <div style="margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 4px;" data-field="directOutput">
+    <div style="margin-top: 12px; padding: 12px; background: var(--pf-t--global--background--color--secondary--default); border-radius: 4px;" data-field="directOutput">
         Direct result will appear here
     </div>
+  </div>
 </div>
