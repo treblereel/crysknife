@@ -67,6 +67,12 @@
   - [3.5.6. Collection Binding with ListComponent](#356-collection-binding-with-listcomponent)
   - [3.5.7. Converters](#357-converters)
   - [3.5.8. Limitations](#358-limitations)
+- [3.6. REST Client](#36-rest-client)
+  - [3.6.1. Dependencies](#361-dependencies)
+  - [3.6.2. Defining a JAX-RS Service Interface](#362-defining-a-jax-rs-service-interface)
+  - [3.6.3. Configuring the REST Endpoint](#363-configuring-the-rest-endpoint)
+  - [3.6.4. Injecting and Using the Caller](#364-injecting-and-using-the-caller)
+  - [3.6.5. Using Qualifiers for Multiple Endpoints](#365-using-qualifiers-for-multiple-endpoints)
 - [4. Contributing to Crysknife](#4-contributing-to-crysknife)
 - [5. Crysknife License](#5-crysknife-license)
 
@@ -1412,6 +1418,197 @@ binder.bind(ageInput, "age", new IntegerConverter());
 * Array-typed properties are not supported — use `List` instead
 * `ListComponent` re-renders the full list on each mutation (no fine-grained DOM diffing)
 * Circular references in `@Bindable` models are not supported
+
+## 3.6. REST Client
+
+Crysknife provides a type-safe REST client built on top of jakarta4g-rest. You define a JAX-RS service interface, and Crysknife generates a `Caller<T>` implementation at compile time. The `Caller` uses `XMLHttpRequest` under the hood and integrates with JSON Mapper for automatic serialization/deserialization.
+
+### 3.6.1. Dependencies
+
+Add the following dependencies to your `pom.xml`:
+
+```xml
+<!-- REST client runtime -->
+<dependency>
+    <groupId>io.crysknife.ui</groupId>
+    <artifactId>crysknife-ui-rest-api</artifactId>
+    <version>${crysknife.version}</version>
+</dependency>
+
+<!-- REST client code generator (compile-time only) -->
+<dependency>
+    <groupId>io.crysknife.ui</groupId>
+    <artifactId>crysknife-ui-rest-generator</artifactId>
+    <version>${crysknife.version}</version>
+    <scope>provided</scope>
+</dependency>
+
+<!-- JAX-RS annotations (J2CL-compatible) -->
+<dependency>
+    <groupId>org.treblereel.gwt.jakarta</groupId>
+    <artifactId>jax-rs</artifactId>
+    <version>0.8</version>
+</dependency>
+
+<!-- jakarta4g-rest runtime -->
+<dependency>
+    <groupId>org.treblereel.gwt.jakarta.rest</groupId>
+    <artifactId>api</artifactId>
+    <version>0.1-SNAPSHOT</version>
+</dependency>
+
+<!-- JSON Mapper runtime -->
+<dependency>
+    <groupId>org.treblereel.gwt.json.mapper</groupId>
+    <artifactId>common</artifactId>
+    <version>0.9</version>
+</dependency>
+
+<!-- jakarta4g-rest annotation processor (compile-time only) -->
+<dependency>
+    <groupId>org.treblereel.gwt.jakarta.rest</groupId>
+    <artifactId>processor</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <scope>provided</scope>
+</dependency>
+
+<!-- JSON Mapper annotation processor (compile-time only) -->
+<dependency>
+    <groupId>org.treblereel.gwt.json.mapper</groupId>
+    <artifactId>processor</artifactId>
+    <version>0.9</version>
+    <scope>provided</scope>
+</dependency>
+```
+
+### 3.6.2. Defining a JAX-RS Service Interface
+
+Define a standard JAX-RS interface. The annotation processor generates a `_RestCaller` implementation and a JSON mapper for each model class used in the interface.
+
+```java
+@Path("/posts")
+public interface PostService {
+
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    Post getPost(@PathParam("id") long id);
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    List<Post> listPosts();
+}
+```
+
+Supported JAX-RS annotations: `@Path`, `@GET`, `@POST`, `@PUT`, `@DELETE`, `@PathParam`, `@QueryParam`, `@Produces`, `@Consumes`.
+
+### 3.6.3. Configuring the REST Endpoint
+
+Use a CDI `@Produces` method to provide a `RestConfig` bean that specifies the base URL for your REST service:
+
+```java
+@ApplicationScoped
+public class MyRestConfig {
+
+    @Produces
+    @Named("myapi")
+    public RestConfig myApiConfig() {
+        return RestConfig.builder()
+                .baseUrl("https://api.example.com")
+                .build();
+    }
+}
+```
+
+If no `@Named` qualifier is specified and no custom `RestConfig` producer exists, the default `RestConfig` uses the current domain as the base URL (suitable for same-origin APIs).
+
+### 3.6.4. Injecting and Using the Caller
+
+Inject `Caller<T>` where `T` is your JAX-RS service interface. Use the `@Named` qualifier to match the `RestConfig` producer:
+
+```java
+@Inject
+@Named("myapi")
+Caller<PostService> postServiceCaller;
+
+public void loadPost() {
+    postServiceCaller
+        .onError((response, throwable) -> {
+            // handle error
+        })
+        .call(response -> {
+            Post post = (Post) response;
+            // use the post
+        })
+        .getPost(1);
+}
+```
+
+The `Caller` API is fluent:
+* `.onError(callback)` — register an error handler (optional)
+* `.call(callback)` — register a success callback and return the service proxy
+* Then call any method on the service proxy — this triggers the actual HTTP request
+
+### 3.6.5. Using Qualifiers for Multiple Endpoints
+
+You can define multiple `RestConfig` producers with different qualifiers to talk to different APIs:
+
+```java
+@ApplicationScoped
+public class RestConfigs {
+
+    @Produces
+    @Named("internal")
+    public RestConfig internalApi() {
+        return RestConfig.builder()
+                .baseUrl("/api")
+                .build();
+    }
+
+    @Produces
+    @Named("external")
+    public RestConfig externalApi() {
+        return RestConfig.builder()
+                .baseUrl("https://external-service.com")
+                .build();
+    }
+}
+```
+
+Then inject with the matching qualifier:
+
+```java
+@Inject
+@Named("internal")
+Caller<ItemService> itemCaller;
+
+@Inject
+@Named("external")
+Caller<PostService> postCaller;
+```
+
+You can also use custom `@Qualifier` annotations instead of `@Named`:
+
+```java
+@Qualifier
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
+public @interface ExternalApi {}
+```
+
+```java
+@Produces
+@ExternalApi
+public RestConfig externalApiConfig() {
+    return RestConfig.builder()
+            .baseUrl("https://external-service.com")
+            .build();
+}
+
+@Inject
+@ExternalApi
+Caller<PostService> externalPostCaller;
+```
 
 # 4. Contributing to Crysknife
 
