@@ -20,6 +20,10 @@
 
     <j2cl.platform.version>20260527-1</j2cl.platform.version>
     <org.treblereel.j2cl.processors.version>0.10</org.treblereel.j2cl.processors.version>
+
+    <jakarta4g.rest.version>0.1</jakarta4g.rest.version>
+    <mapper.json.version>0.10</mapper.json.version>
+    <gwt.jakarta.version>0.8</gwt.jakarta.version>
   </properties>
 
   <dependencyManagement>
@@ -64,12 +68,65 @@
 
     <dependency>
       <groupId>io.crysknife.ui</groupId>
+      <artifactId>crysknife-ui-rest-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.crysknife.ui</groupId>
+      <artifactId>crysknife-ui-rest-generator</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.treblereel.gwt.jakarta</groupId>
+      <artifactId>jax-rs</artifactId>
+      <version>${gwt.jakarta.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.treblereel.gwt.jakarta.rest</groupId>
+      <artifactId>api</artifactId>
+      <version>${jakarta4g.rest.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.treblereel.gwt.json.mapper</groupId>
+      <artifactId>common</artifactId>
+      <version>${mapper.json.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.treblereel.gwt.jakarta.rest</groupId>
+      <artifactId>processor</artifactId>
+      <version>${jakarta4g.rest.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.treblereel.gwt.json.mapper</groupId>
+      <artifactId>processor</artifactId>
+      <version>${mapper.json.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.crysknife.ui</groupId>
       <artifactId>crysknife-ui-databinding-api</artifactId>
     </dependency>
     <dependency>
       <groupId>io.crysknife.ui</groupId>
       <artifactId>crysknife-ui-databinding-generator</artifactId>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.patternfly</groupId>
+      <artifactId>patternfly-java-components</artifactId>
+      <version>0.3.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.patternfly</groupId>
+      <artifactId>patternfly-java-j2cl</artifactId>
+      <version>0.3.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.patternfly</groupId>
+      <artifactId>patternfly-java-icons</artifactId>
+      <version>0.3.0</version>
     </dependency>
 
     <dependency>

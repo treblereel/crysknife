@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Treblereel
+ * Copyright © 2025 Treblereel
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -11,48 +11,29 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
+package io.crysknife.demo.client.notfound;
 
-package io.crysknife.demo.client;
-
-import io.crysknife.ui.navigation.client.Navigation;
-import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 import elemental2.dom.HTMLDivElement;
-import elemental2.dom.HTMLElement;
 import io.crysknife.client.IsElement;
+import io.crysknife.ui.navigation.client.PageNotFound;
+import io.crysknife.ui.navigation.client.annotation.Page;
 import io.crysknife.ui.templates.client.annotation.DataField;
 import io.crysknife.ui.templates.client.annotation.Templated;
 
-/**
- * @author Dmitrii Tikhomirov
- * Created by treblereel 3/12/20
- */
 @Singleton
-@Templated(value = "main.html")
-public class Main implements IsElement<HTMLDivElement> {
+@Page(path = "NotFound", role = PageNotFound.class)
+@Templated("notfoundpage.html")
+public class NotFoundPage implements IsElement<HTMLDivElement> {
 
-    @Inject
-    @DataField
-    private HTMLDivElement root, container;
+  @Inject
+  @DataField
+  HTMLDivElement root;
 
-    @Inject
-    private Navigation navigation;
-
-    @Inject
-    @DataField
-    @Named("span")
-    private HTMLElement span;
-
-    @PostConstruct
-    public void init() {
-        navigation.setNavigationContainer(container);
-    }
-
-    @Override
-    public HTMLDivElement getElement() {
-        return root;
-    }
+  @Override
+  public HTMLDivElement getElement() {
+    return root;
+  }
 }
