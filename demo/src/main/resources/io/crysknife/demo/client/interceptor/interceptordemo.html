@@ -41,21 +41,21 @@
     }\n
     </pre>
 
-    <div class="pf-v6-c-form__group">
-        <label class="pf-v6-c-form__label">Name:</label>
-        <input class="pf-v6-c-form-control" style="width: 300px;" data-field="nameInput" placeholder="World">
-    </div>
+    <div class="demo-playground">
+        <div class="pf-v6-c-form__group">
+            <label class="pf-v6-c-form__label">Name:</label>
+            <input class="pf-v6-c-form-control" style="width: 300px;" data-field="nameInput" placeholder="World">
+        </div>
 
-    <div style="margin-top: 12px;">
         <button class="pf-v6-c-button pf-m-primary pf-m-small" data-field="greetBtn">greet(name)</button>
         <button class="pf-v6-c-button pf-m-tertiary pf-m-small" data-field="addBtn">add(3, 7)</button>
         <button class="pf-v6-c-button pf-m-secondary pf-m-small" data-field="noInterceptBtn">notIntercepted()</button>
         <button class="pf-v6-c-button pf-m-warning pf-m-small" data-field="clearBtn">Clear log</button>
+
+        <div class="demo-result" data-field="resultOutput"></div>
+
+        <label class="pf-v6-c-form__label" style="margin-top: 12px;">Interceptor log:</label>
+        <textarea class="demo-result pf-v6-c-form-control" rows="8" readonly data-field="logOutput" style="font-family: monospace; font-size: 12px;"></textarea>
     </div>
-
-    <div style="margin-top: 12px; padding: 12px; background: var(--pf-t--global--background--color--secondary--default); border-radius: 4px;" data-field="resultOutput"></div>
-
-    <label class="pf-v6-c-form__label" style="margin-top: 12px;">Interceptor log:</label>
-    <textarea class="pf-v6-c-form-control" rows="8" readonly data-field="logOutput" style="font-family: monospace; font-size: 12px;"></textarea>
   </div>
 </div>

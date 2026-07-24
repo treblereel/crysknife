@@ -462,6 +462,42 @@
   }
 }
 
+/* === Demo Playground === */
+
+.demo-playground {
+    margin-top: 16px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--pf-t--global--border--color--default, #383838);
+    border-radius: 8px;
+}
+
+.demo-playground .pf-v6-c-form__label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.demo-playground input[disabled].pf-v6-c-form-control {
+    opacity: 1;
+    color: var(--pf-t--global--text--color--regular, #e0e0e0);
+    border-color: var(--pf-t--global--border--color--default, #383838);
+}
+
+.demo-playground .pf-v6-c-button {
+    margin-top: 8px;
+    margin-right: 6px;
+}
+
+.demo-result {
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--pf-t--global--border--color--default, #383838);
+    border-radius: 4px;
+    min-height: 20px;
+    color: var(--pf-t--global--text--color--regular, #e0e0e0);
+}
+
 /* 404 Page */
 .ck-notfound {
   text-align: center;
