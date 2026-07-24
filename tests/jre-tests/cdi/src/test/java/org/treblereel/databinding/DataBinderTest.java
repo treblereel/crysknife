@@ -153,6 +153,35 @@ public class DataBinderTest extends AbstractTest {
   }
 
   @Test
+  public void testUnbindAllClearsHandlers() {
+    List<PropertyChangeEvent<?>> events = new ArrayList<>();
+    app.userBinder.addPropertyChangeHandler(events::add);
+    app.userBinder.addPropertyChangeHandler("name", events::add);
+
+    app.userBinder.unbind();
+
+    UserModel model = app.userBinder.getModel();
+    model.setName("Ghost");
+    assertEquals(0, events.size());
+  }
+
+  @Test
+  public void testUnbindPropertyClearsPropertyHandler() {
+    List<PropertyChangeEvent<?>> nameEvents = new ArrayList<>();
+    List<PropertyChangeEvent<?>> globalEvents = new ArrayList<>();
+    app.userBinder.addPropertyChangeHandler(globalEvents::add);
+    app.userBinder.addPropertyChangeHandler("name", nameEvents::add);
+
+    app.userBinder.unbind("name");
+
+    UserModel model = app.userBinder.getModel();
+    model.setName("Test");
+
+    assertEquals(0, nameEvents.size());
+    assertEquals(1, globalEvents.size());
+  }
+
+  @Test
   public void testOldValueInEvent() {
     UserModel model = app.userBinder.getModel();
     model.setName("First");

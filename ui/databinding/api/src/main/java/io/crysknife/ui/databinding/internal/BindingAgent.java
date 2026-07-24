@@ -160,6 +160,7 @@ public class BindingAgent {
         removeDomListener(b);
       }
     }
+    propertyHandlers.remove(property);
   }
 
   public void unbindAll() {
@@ -181,6 +182,9 @@ public class BindingAgent {
     nestedBindingsMap.clear();
 
     listBindings.clear();
+
+    globalHandlers.clear();
+    propertyHandlers.clear();
   }
 
   public Set<String> getBoundProperties() {
