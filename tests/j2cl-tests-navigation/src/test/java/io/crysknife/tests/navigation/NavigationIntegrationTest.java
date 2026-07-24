@@ -645,6 +645,71 @@ public class NavigationIntegrationTest {
             "@PageState List<Boolean> should be [true, false], got: " + stateText);
     }
 
+    // --- Listener dedup after reinit ---
+
+    @Test
+    void testNoDoubleEventsAfterReinit() {
+        clickElement("go-to-a-btn");
+        waitForElement("page-a");
+
+        new WebDriverWait(driver, Duration.ofSeconds(5))
+            .until(d -> d.findElement(By.id("log")).getText()
+                .contains("[PageA] @PageShown"));
+
+        clickElement("page-a-back-btn");
+        waitForElement("home-page");
+
+        new WebDriverWait(driver, Duration.ofSeconds(5))
+            .until(d -> countOccurrences(
+                d.findElement(By.id("log")).getText(), "[HomePage] @PageShown") >= 2);
+
+        // Re-initialize navigation (calls setNavigationContainer again → init())
+        clickElement("reinit-nav-btn");
+
+        // Clear the log so we can count fresh events
+        ((JavascriptExecutor) driver)
+            .executeScript("document.getElementById('log').textContent = ''");
+
+        // Navigate to PageA via hash
+        navigateToHash("PageA");
+        waitForElement("page-a");
+
+        new WebDriverWait(driver, Duration.ofSeconds(5))
+            .until(d -> d.findElement(By.id("log")).getText()
+                .contains("[PageA] @PageShown"));
+
+        String log = driver.findElement(By.id("log")).getText();
+        assertEquals(1, countOccurrences(log, "[PageA] @PageShowing"),
+            "After reinit, @PageShowing should fire exactly once, log: " + log);
+        assertEquals(1, countOccurrences(log, "[PageA] @PageShown"),
+            "After reinit, @PageShown should fire exactly once, log: " + log);
+    }
+
+    @Test
+    void testMultipleReinitStillSingleEvents() {
+        // Reinit navigation 3 times
+        clickElement("reinit-nav-btn");
+        clickElement("reinit-nav-btn");
+        clickElement("reinit-nav-btn");
+
+        // Clear log
+        ((JavascriptExecutor) driver)
+            .executeScript("document.getElementById('log').textContent = ''");
+
+        navigateToHash("PageA");
+        waitForElement("page-a");
+
+        new WebDriverWait(driver, Duration.ofSeconds(5))
+            .until(d -> d.findElement(By.id("log")).getText()
+                .contains("[PageA] @PageShown"));
+
+        String log = driver.findElement(By.id("log")).getText();
+        assertEquals(1, countOccurrences(log, "[PageA] @PageShowing"),
+            "After 3 reinits, @PageShowing should fire exactly once, log: " + log);
+        assertEquals(1, countOccurrences(log, "[PageA] @PageShown"),
+            "After 3 reinits, @PageShown should fire exactly once, log: " + log);
+    }
+
     // --- helpers ---
 
     private void clickElement(String id) {

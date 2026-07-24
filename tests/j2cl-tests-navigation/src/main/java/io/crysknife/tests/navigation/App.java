@@ -38,5 +38,10 @@ public class App {
     HTMLElement container =
         (HTMLElement) DomGlobal.document.getElementById("navigation-container");
     navigation.setNavigationContainer(container);
+
+    HTMLElement reinitBtn = (HTMLElement) DomGlobal.document.getElementById("reinit-nav-btn");
+    if (reinitBtn != null) {
+      reinitBtn.addEventListener("click", evt -> navigation.setNavigationContainer(container));
+    }
   }
 }
