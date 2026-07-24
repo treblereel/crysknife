@@ -24,7 +24,6 @@ import io.crysknife.client.internal.collections.BiMap;
 import io.crysknife.client.internal.collections.ImmutableMultimap;
 import io.crysknife.client.internal.collections.Multimap;
 import io.crysknife.ui.navigation.client.annotation.Page;
-import jsinterop.base.Js;
 
 /**
  * Used to match URLs typed in by the user to the correct {@link Page#path()}
@@ -75,7 +74,7 @@ public class URLPatternMatcher {
 
     while ((mr = regex.exec(urlTemplate)) != null) {
       addParamName(paramList, mr);
-      startOfNextPattern = Js.asInt(mr.index);
+      startOfNextPattern = mr.index;
 
       // Append any string literal that may occur in the URL path
       // before the next parameter.
@@ -108,11 +107,11 @@ public class URLPatternMatcher {
     final Multimap<String, String> mapBuilder = new Multimap<>();
     String keyValuePairs, pageInfo;
 
-    final int indexOfSemicolon = url.indexOf(';');
+    final int indexOfQuestion = url.indexOf('?');
 
-    if (indexOfSemicolon > 0) {
-      pageInfo = url.substring(0, indexOfSemicolon);
-      keyValuePairs = url.substring(indexOfSemicolon + 1);
+    if (indexOfQuestion > 0) {
+      pageInfo = url.substring(0, indexOfQuestion);
+      keyValuePairs = url.substring(indexOfQuestion + 1);
     } else {
       pageInfo = url;
       keyValuePairs = null;

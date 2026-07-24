@@ -25,7 +25,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import elemental2.core.JsArray;
-import elemental2.core.JsString;
 import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLElement;
 import elemental2.dom.HashChangeEvent;
@@ -548,13 +547,9 @@ public class Navigation {
     private String hash() {
         String raw = window.location.hash;
         if (!raw.isEmpty()) {
-            if (raw.indexOf("?") > 0) {
-                raw = new JsString(raw).split("?").getAt(0);
-            }
             raw = raw.replaceFirst("#", "");
         }
         return raw;
-
     }
 
     /**
