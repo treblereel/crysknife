@@ -21,21 +21,77 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates that the annotated field holds information about the state of the current page. The
- * navigation framework writes state information from the history token to the field when navigating
- * to the page, before {@code @PageShowing} is called.
- * <p>
- * The target field must not be {@code private} or {@code final}. Supported field types:
- * {@code String}, {@code int}/{@code Integer}, {@code long}/{@code Long},
- * {@code boolean}/{@code Boolean}, {@code double}/{@code Double}, {@code float}/{@code Float},
- * {@code short}/{@code Short}, {@code byte}/{@code Byte},
- * {@code List<String>}, {@code List<Integer>}, {@code List<Long>}, {@code List<Boolean>},
- * {@code List<Double>}, {@code List<Float>}, {@code List<Short>}, {@code List<Byte>}.
- * <p>
- * For {@code List} fields, all URL parameter values are collected into the list.
- * {@code defaultValue} is not supported for {@code List} fields.
+ * Binds a field to a URL query parameter. The navigation framework injects values from the
+ * browser's hash fragment into annotated fields before {@code @PageShowing} is called, and
+ * re-injects on every {@code @PageUpdate} when the URL changes while staying on the same page.
+ *
+ * <h3>Field requirements</h3>
+ * The field must not be {@code private} or {@code final}.
+ *
+ * <h3>Supported scalar types</h3>
+ * <ul>
+ *   <li>{@code String}</li>
+ *   <li>{@code int} / {@code Integer}</li>
+ *   <li>{@code long} / {@code Long}</li>
+ *   <li>{@code boolean} / {@code Boolean}</li>
+ *   <li>{@code double} / {@code Double}</li>
+ *   <li>{@code float} / {@code Float}</li>
+ *   <li>{@code short} / {@code Short}</li>
+ *   <li>{@code byte} / {@code Byte}</li>
+ * </ul>
+ *
+ * <h3>Supported list types</h3>
+ * For multi-valued query parameters (e.g. {@code ?tag=a&tag=b&tag=c}):
+ * <ul>
+ *   <li>{@code List<String>}</li>
+ *   <li>{@code List<Integer>}, {@code List<Long>}, {@code List<Boolean>},
+ *       {@code List<Double>}, {@code List<Float>}, {@code List<Short>},
+ *       {@code List<Byte>}</li>
+ * </ul>
+ * If the parameter is absent, the field receives an empty list.
+ * {@link #defaultValue()} is not supported for list fields (compile-time error).
+ *
+ * <h3>Parameter naming</h3>
+ * By default, the query parameter name matches the field name. Use {@link #value()} to map
+ * the field to a differently-named parameter:
+ * <pre>{@code
+ * @PageState("q")
+ * String query;  // reads from ?q=...
+ * }</pre>
+ *
+ * <h3>Default values</h3>
+ * Use {@link #defaultValue()} to provide a fallback when the parameter is absent:
+ * <pre>{@code
+ * @PageState(defaultValue = "1")
+ * int page;  // defaults to 1 when ?page is missing
+ * }</pre>
+ * If no default is specified and the parameter is absent, the field is left unmodified.
+ *
+ * <h3>Usage example</h3>
+ * <pre>{@code
+ * @Page(path = "search")
+ * public class SearchPage implements IsElement<HTMLDivElement> {
+ *
+ *     @PageState("q")
+ *     String query;
+ *
+ *     @PageState(defaultValue = "1")
+ *     int page;
+ *
+ *     @PageState
+ *     List<String> tags;  // #search?q=hello&page=2&tags=java&tags=j2cl
+ *
+ *     @PageShown
+ *     void onShown() {
+ *         // query = "hello", page = 2, tags = ["java", "j2cl"]
+ *     }
+ * }
+ * }</pre>
  *
  * @see Page
+ * @see io.crysknife.ui.navigation.client.annotation.PageShowing
+ * @see io.crysknife.ui.navigation.client.annotation.PageShown
+ * @see io.crysknife.ui.navigation.client.annotation.PageUpdate
  *
  * @author Jonathan Fuerth <jfuerth@redhat.com>
  */
