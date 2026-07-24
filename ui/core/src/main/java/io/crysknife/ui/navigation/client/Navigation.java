@@ -89,6 +89,8 @@ public class Navigation {
     @Inject
     private HistoryTokenFactory historyTokenFactory;
     private Window window = DomGlobal.window;
+    private elemental2.dom.EventListener hashChangeListener;
+    private elemental2.dom.EventListener locationChangeListener;
 
     /**
      * Gets the application context used in pushstate URL paths. This application context should match
@@ -108,23 +110,37 @@ public class Navigation {
             return;
         }
 
+        removeWindowListeners();
+
         String raw = window.location.hash;
-        navigationErrorHandler = new DefaultNavigationErrorHandler(this);
         navigationErrorHandler = new DefaultNavigationErrorHandler(this);
         processToken(raw);
 
-        window.addEventListener("hashchange", evt -> {
+        hashChangeListener = evt -> {
             String raw1 = window.location.hash;
             processToken(raw1);
-        });
+        };
+        window.addEventListener("hashchange", hashChangeListener);
 
-        window.addEventListener("locationchange", evt -> {
+        locationChangeListener = evt -> {
             HashChangeEvent.HashChangeEventEventInitDictType eventEventInitDictType =
                     HashChangeEvent.HashChangeEventEventInitDictType.create();
             eventEventInitDictType.setOldURL(hash());
             eventEventInitDictType.setNewURL(window.location.href);
             window.dispatchEvent(new HashChangeEvent("hashchange", eventEventInitDictType));
-        });
+        };
+        window.addEventListener("locationchange", locationChangeListener);
+    }
+
+    private void removeWindowListeners() {
+        if (hashChangeListener != null) {
+            window.removeEventListener("hashchange", hashChangeListener);
+            hashChangeListener = null;
+        }
+        if (locationChangeListener != null) {
+            window.removeEventListener("locationchange", locationChangeListener);
+            locationChangeListener = null;
+        }
     }
 
     private void processToken(String raw) {
@@ -153,7 +169,12 @@ public class Navigation {
 
     @PreDestroy
     public void cleanUp() {
+        removeWindowListeners();
         setErrorHandler(null);
+        currentPage = null;
+        currentNode = null;
+        currentElements = null;
+        currentToken = null;
     }
 
     /**
