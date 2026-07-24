@@ -121,7 +121,7 @@ public class URLPattern {
     }
 
     StringBuilder urlBuilder = new StringBuilder(url);
-    urlBuilder.append(';');
+    urlBuilder.append('?');
 
     Iterator<Entry<String, String>> itr = state.entries().iterator();
 
@@ -147,7 +147,7 @@ public class URLPattern {
   }
 
   /**
-   * Replaces the characters used for parsing with their encoded equivalents. The characters ";",
+   * Replaces the characters used for parsing with their encoded equivalents. The characters "?",
    * "/", "&" and "=" are used in URLPattern and URLPatternMatcher to parse the given URL. Hence any
    * occurrences of these characters in the actual page state values are 'escaped' so that it
    * doesn't interfere with our URL parsing.
@@ -157,7 +157,7 @@ public class URLPattern {
    * @return The same value with the appropriate characters 'escaped'.
    */
   static String encodeParsingCharacters(String plainValue) {
-    return plainValue.replaceAll("%", "%25").replaceAll(";", "%3B").replaceAll("/", "%2F")
+    return plainValue.replaceAll("%", "%25").replaceAll("\\?", "%3F").replaceAll("/", "%2F")
         .replaceAll("&", "%26").replaceAll("=", "%3D");
   }
 
@@ -165,12 +165,12 @@ public class URLPattern {
    * This method is the converse of {@link URLPattern#encodeParsingCharacters}. It 'un-escapes' all
    * the parsing characters encoded by {@link URLPattern#encodeParsingCharacters}.
    *
-   * @param escapedValue The string where the characters ";", "/", "&" and "=" have been encoded.
+   * @param escapedValue The string where the characters "?", "/", "&" and "=" have been encoded.
    *
    * @return The same string where all the encoded values are replaced by the actual characters.
    */
   static String decodeParsingCharacters(String escapedValue) {
-    return escapedValue.replaceAll("%3B", ";").replaceAll("%2F", "/").replaceAll("%26", "&")
+    return escapedValue.replaceAll("%3F", "?").replaceAll("%2F", "/").replaceAll("%26", "&")
         .replaceAll("%3D", "=").replace("%25", "%");
   }
 }

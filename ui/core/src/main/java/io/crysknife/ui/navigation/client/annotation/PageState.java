@@ -23,17 +23,17 @@ import java.lang.annotation.Target;
 /**
  * Indicates that the annotated field holds information about the state of the current page. The
  * navigation framework writes state information from the history token to the field when navigating
- * to the page.
+ * to the page, before {@code @PageShowing} is called.
  * <p>
- * The target field must be one of the following types that are supported by the navigation system:
- * <ul>
- * <li>A primitive type (other than char): boolean, byte, short, int, long, float, or double
- * <li>A boxed primitive type (other than Character): Boolean, Byte, Short, Integer, Long, Float, or
- * Double
- * <li>String
- * <li>A collection of any of the above (the field type must be {@code Collection<T>},
- * {@code List<T>}, or {@code Set<T>} where {@code T} is a boxed primitive or String).
- * </ul>
+ * The target field must not be {@code private} or {@code final}. Supported field types:
+ * {@code String}, {@code int}/{@code Integer}, {@code long}/{@code Long},
+ * {@code boolean}/{@code Boolean}, {@code double}/{@code Double}, {@code float}/{@code Float},
+ * {@code short}/{@code Short}, {@code byte}/{@code Byte},
+ * {@code List<String>}, {@code List<Integer>}, {@code List<Long>}, {@code List<Boolean>},
+ * {@code List<Double>}, {@code List<Float>}, {@code List<Short>}, {@code List<Byte>}.
+ * <p>
+ * For {@code List} fields, all URL parameter values are collected into the list.
+ * {@code defaultValue} is not supported for {@code List} fields.
  *
  * @see Page
  *
@@ -44,10 +44,18 @@ import java.lang.annotation.Target;
 @Documented
 public @interface PageState {
 
+  String DEFAULT_VALUE_UNSET = "\0";
+
   /**
    * Provides a way to map the field name to a different value for the query parameter. If not
    * specified, the name of the field will be used as the name of the query parameter.
    */
   String value() default "";
+
+  /**
+   * Provides a default value for the field when the query parameter is not present in the URL.
+   * If not specified and the parameter is absent, the field is not modified.
+   */
+  String defaultValue() default DEFAULT_VALUE_UNSET;
 
 }
