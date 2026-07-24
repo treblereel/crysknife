@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 
+import elemental2.dom.EventListener;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -89,8 +90,8 @@ public class Navigation {
     @Inject
     private HistoryTokenFactory historyTokenFactory;
     private Window window = DomGlobal.window;
-    private elemental2.dom.EventListener hashChangeListener;
-    private elemental2.dom.EventListener locationChangeListener;
+    private EventListener hashChangeListener;
+    private EventListener locationChangeListener;
 
     /**
      * Gets the application context used in pushstate URL paths. This application context should match
