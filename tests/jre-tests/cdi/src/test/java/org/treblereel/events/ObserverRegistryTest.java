@@ -119,4 +119,73 @@ public class ObserverRegistryTest {
 
     assertEquals(0, log.size());
   }
+
+  @Test
+  public void testUnsubscribeAllRemovesAcrossEventTypes() {
+    List<String> log = new ArrayList<>();
+    Object owner = new Object();
+
+    registry.subscribe(SimpleEvent.class, owner, e -> log.add("simple"));
+    registry.subscribe(ChildEvent.class, owner, e -> log.add("child"));
+
+    registry.unsubscribeAll(owner);
+
+    registry.fire(SimpleEvent.class, new SimpleEvent());
+    registry.fire(ChildEvent.class, new ChildEvent());
+
+    assertEquals(0, log.size());
+  }
+
+  @Test
+  public void testUnsubscribeAllLeavesOtherOwners() {
+    List<String> log = new ArrayList<>();
+    Object owner1 = new Object();
+    Object owner2 = new Object();
+
+    registry.subscribe(SimpleEvent.class, owner1, e -> log.add("owner1"));
+    registry.subscribe(SimpleEvent.class, owner2, e -> log.add("owner2"));
+
+    registry.unsubscribeAll(owner1);
+    registry.fire(SimpleEvent.class, new SimpleEvent());
+
+    assertEquals(1, log.size());
+    assertEquals("owner2", log.get(0));
+  }
+
+  @Test
+  public void testFireDoesNotThrowWhenCallbackUnsubscribes() {
+    List<String> log = new ArrayList<>();
+    Object owner = new Object();
+
+    registry.subscribe(SimpleEvent.class, owner, e -> {
+      log.add("first");
+      registry.unsubscribe(SimpleEvent.class, owner);
+    });
+
+    registry.fire(SimpleEvent.class, new SimpleEvent());
+    assertEquals(1, log.size());
+
+    log.clear();
+    registry.fire(SimpleEvent.class, new SimpleEvent());
+    assertEquals(0, log.size());
+  }
+
+  @Test
+  public void testFireDoesNotThrowWhenCallbackSubscribes() {
+    List<String> log = new ArrayList<>();
+    Object owner1 = new Object();
+    Object owner2 = new Object();
+
+    registry.subscribe(SimpleEvent.class, owner1, e -> {
+      log.add("first");
+      registry.subscribe(SimpleEvent.class, owner2, e2 -> log.add("added"));
+    });
+
+    registry.fire(SimpleEvent.class, new SimpleEvent());
+    assertEquals(1, log.size());
+    assertEquals("first", log.get(0));
+  }
+
+  static class ChildEvent extends SimpleEvent {
+  }
 }

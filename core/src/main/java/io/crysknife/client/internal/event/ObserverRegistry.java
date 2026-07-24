@@ -45,15 +45,24 @@ public class ObserverRegistry {
     }
   }
 
+  public void unsubscribeAll(Object ownerInstance) {
+    for (Map<Object, List<Consumer<Object>>> byOwner : observers.values()) {
+      byOwner.remove(ownerInstance);
+    }
+    observers.values().removeIf(Map::isEmpty);
+  }
+
   public void fire(Class<?> eventType, Object event) {
     List<Class<?>> hierarchy = getTypeHierarchy(eventType);
     for (Class<?> type : hierarchy) {
       Map<Object, List<Consumer<Object>>> byOwner = observers.get(type);
       if (byOwner != null) {
+        List<Consumer<Object>> snapshot = new ArrayList<>();
         for (List<Consumer<Object>> callbacks : byOwner.values()) {
-          for (Consumer<Object> callback : callbacks) {
-            callback.accept(event);
-          }
+          snapshot.addAll(callbacks);
+        }
+        for (Consumer<Object> callback : snapshot) {
+          callback.accept(event);
         }
       }
     }
