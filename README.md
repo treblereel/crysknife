@@ -58,6 +58,7 @@
   - [3.4.3. Page Roles](#343-page-roles)
   - [3.4.4. Page Lifecycle](#344-page-lifecycle)
   - [3.4.5. Following a Manual Link](#345-following-a-manual-link)
+  - [3.4.6. Page State (URL Parameters)](#346-page-state-url-parameters)
 - [3.5. Data Binding](#35-data-binding)
   - [3.5.1. @Bindable Models](#351-bindable-models)
   - [3.5.2. @Bound Fields](#352-bound-fields)
@@ -1173,6 +1174,84 @@ public class WelcomePage implements IsElement {
     startButtonClicked.go();
   }
 
+}
+```
+
+### 3.4.6. Page State (URL Parameters)
+
+Use the `@PageState` annotation to bind fields in a `@Page` bean to URL query parameters. The navigation framework automatically injects values from the hash fragment before `@PageShowing` is called, and re-injects on `@PageUpdate` when the URL changes while staying on the same page.
+
+#### Supported types
+
+**Scalar types:** `String`, `int`/`Integer`, `long`/`Long`, `boolean`/`Boolean`, `double`/`Double`, `float`/`Float`, `short`/`Short`, `byte`/`Byte`.
+
+**List types** (for multi-valued parameters): `List<String>`, `List<Integer>`, `List<Long>`, `List<Boolean>`, `List<Double>`, `List<Float>`, `List<Short>`, `List<Byte>`.
+
+#### Basic usage
+
+```java
+@Page(path = "search")
+@Templated
+@ApplicationScoped
+public class SearchPage implements IsElement<HTMLDivElement> {
+
+    @PageState
+    String query;              // #search?query=hello
+
+    @PageState
+    int page;                  // #search?page=2
+
+    @PageState
+    List<String> tags;         // #search?tags=java&tags=j2cl → ["java", "j2cl"]
+
+    @PageState
+    List<Integer> ids;         // #search?ids=1&ids=2&ids=3 → [1, 2, 3]
+
+    @PageShown
+    void onShown() {
+        // query = "hello", page = 2, tags = ["java", "j2cl"], ids = [1, 2, 3]
+    }
+}
+```
+
+#### Custom parameter names
+
+By default, the query parameter name matches the field name. Use the `value` attribute to map to a different name:
+
+```java
+@PageState("q")
+String query;  // reads from ?q=...
+```
+
+#### Default values
+
+Use `defaultValue` to provide a fallback when the parameter is absent:
+
+```java
+@PageState(defaultValue = "1")
+int page;  // defaults to 1 when ?page is missing
+
+@PageState(defaultValue = "true")
+boolean active;
+```
+
+If no default is specified and the parameter is absent, scalar fields are left unmodified and list fields receive an empty list.
+
+**Note:** `defaultValue` is not supported for `List` fields — this is enforced at compile time.
+
+#### Navigating with state
+
+Pass page state through `TransitionTo` using a `Multimap`:
+
+```java
+@Inject
+TransitionTo<SearchPage> toSearch;
+
+public void search(String query, List<String> tags) {
+    Multimap<String, String> state = ImmutableMultimap.of();
+    state.put("query", query);
+    tags.forEach(tag -> state.put("tags", tag));
+    toSearch.go(state);
 }
 ```
 
