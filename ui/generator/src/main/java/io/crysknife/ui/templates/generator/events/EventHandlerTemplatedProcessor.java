@@ -36,7 +36,6 @@ import io.crysknife.generator.context.IOCContext;
 import io.crysknife.generator.helpers.MethodCallGenerator;
 import io.crysknife.ui.templates.client.annotation.EventHandler;
 import io.crysknife.ui.templates.client.annotation.ForEvent;
-import io.crysknife.ui.templates.client.annotation.SinkNative;
 import io.crysknife.ui.templates.generator.dto.Event;
 import io.crysknife.ui.templates.generator.dto.TemplateDefinition;
 import org.jboss.gwt.elemento.processor.AbortProcessingException;
@@ -111,27 +110,21 @@ public class EventHandlerTemplatedProcessor {
     for (EventHandlerInfo eventHandlerInfo : templateContext.getEvents()) {
       try {
         eventHandlerValidator.validate(eventHandlerInfo.getMethod());
-        if (MoreElements.isAnnotationPresent(eventHandlerInfo.getMethod(), SinkNative.class)) {
-          throw new GenerationException(
-                  String.format("Method %s annotated with @SinkNative must be static",
-                          eventHandlerInfo.getMethod().getSimpleName()));
-        } else {
-          String[] eventTypes = eventHandlerInfo.getMethod().getParameters().get(0)
-                  .getAnnotation(ForEvent.class).value();
-          String clazz = iocContext.getGenerationContext().getTypes()
-                  .erasure(eventHandlerInfo.getMethod().getParameters().get(0).asType()).toString();
-          String call = methodCallGenerator.generate(beanDefinition.getType(),
-                  eventHandlerInfo.getMethod(), List.of("e"));
-          DataElementInfo info = eventHandlerInfo.getInfo();
-          boolean rootBound = info == null;
-          String mangleName = rootBound ? null
-                  : j2CLUtils.getVariableMangledName(info.getField());
-          boolean isElement = !rootBound && info.getKind() == Kind.IsElement;
-          boolean elementoIsElement = !rootBound && info.getKind() == Kind.ElementoIsElement;
-          Event event = new Event(eventTypes, mangleName, clazz, call,
-                  isElement, elementoIsElement, rootBound);
-          templateDefinition.getEvents().add(event);
-        }
+        String[] eventTypes = eventHandlerInfo.getMethod().getParameters().get(0)
+                .getAnnotation(ForEvent.class).value();
+        String clazz = iocContext.getGenerationContext().getTypes()
+                .erasure(eventHandlerInfo.getMethod().getParameters().get(0).asType()).toString();
+        String call = methodCallGenerator.generate(beanDefinition.getType(),
+                eventHandlerInfo.getMethod(), List.of("e"));
+        DataElementInfo info = eventHandlerInfo.getInfo();
+        boolean rootBound = info == null;
+        String mangleName = rootBound ? null
+                : j2CLUtils.getVariableMangledName(info.getField());
+        boolean isElement = !rootBound && info.getKind() == Kind.IsElement;
+        boolean elementoIsElement = !rootBound && info.getKind() == Kind.ElementoIsElement;
+        Event event = new Event(eventTypes, mangleName, clazz, call,
+                isElement, elementoIsElement, rootBound);
+        templateDefinition.getEvents().add(event);
       } catch (UnableToCompleteException e) {
         throw new GenerationException(e);
       }
