@@ -23,5 +23,6 @@
     <module>j2cl-tests-custom-policy</module>
     <module>j2cl-tests-rest</module>
     <module>j2cl-tests-navigation</module>
+    <module>j2cl-tests-templates</module>
   </modules>
 </project>

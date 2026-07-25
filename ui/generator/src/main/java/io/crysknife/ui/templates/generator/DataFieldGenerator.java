@@ -107,7 +107,8 @@ public class DataFieldGenerator {
                         verifyHTMLElement(typeName, selector, field, templateSelector, root);
                     }
 
-                    dataElements.add(new DataElementInfo(field, selector, kind));
+                    String strategy = getStrategy(field);
+                    dataElements.add(new DataElementInfo(field, selector, kind, strategy));
                 });
         return dataElements;
     }
@@ -156,10 +157,11 @@ public class DataFieldGenerator {
                     element.getKind() == DataElementInfo.Kind.ElementoIsElement;
             boolean isCrysknifeIsElement =
                     element.getKind() == DataElementInfo.Kind.IsElement;
+            boolean useBean = "USE_BEAN".equals(element.getStrategy());
             io.crysknife.ui.templates.generator.dto.Element elementDto =
                     new io.crysknife.ui.templates.generator.dto.Element(element.getSelector(), mangleName,
                             element.getType().toString(), element.needsCast(), isElemento,
-                            isCrysknifeIsElement);
+                            isCrysknifeIsElement, useBean);
 
             templateDefinition.getElements().add(elementDto);
         }
@@ -233,17 +235,28 @@ public class DataFieldGenerator {
     }
 
     private String getSelector(Element element) {
-        String selector = null;
+        String selector = getAnnotationValue(element, "value");
+        return Strings.emptyToNull(selector) == null ? element.getSimpleName().toString() : selector;
+    }
+
+    private String getStrategy(Element element) {
+        String strategy = getAnnotationValue(element, "strategy");
+        return Strings.emptyToNull(strategy) == null ? "USE_TEMPLATE" : strategy;
+    }
+
+    private String getAnnotationValue(Element element, String methodName) {
         Optional<AnnotationMirror> annotationMirror =
                 MoreElements.getAnnotationMirror(element, DataField.class).toJavaUtil();
         if (annotationMirror.isPresent()) {
             Map<? extends ExecutableElement, ? extends AnnotationValue> values = processingEnvironment
                     .getElementUtils().getElementValuesWithDefaults(annotationMirror.get());
-            if (!values.isEmpty()) {
-                selector = String.valueOf(values.values().iterator().next().getValue());
+            for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : values.entrySet()) {
+                if (entry.getKey().getSimpleName().toString().equals(methodName)) {
+                    return String.valueOf(entry.getValue().getValue());
+                }
             }
         }
-        return Strings.emptyToNull(selector) == null ? element.getSimpleName().toString() : selector;
+        return null;
     }
 
     private void abortWithError(Element element, String msg, Object... args) {
