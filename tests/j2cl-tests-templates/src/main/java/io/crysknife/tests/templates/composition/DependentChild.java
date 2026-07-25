@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Treblereel
+ * Copyright © 2026 Treblereel
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -11,22 +11,24 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
+package io.crysknife.tests.templates.composition;
 
-package io.crysknife.ui.templates.client.annotation;
+import jakarta.inject.Inject;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import elemental2.dom.HTMLDivElement;
+import io.crysknife.client.IsElement;
+import io.crysknife.ui.templates.client.annotation.DataField;
+import io.crysknife.ui.templates.client.annotation.Templated;
 
-/**
- * @author Dmitrii Tikhomirov Created by treblereel 4/7/19
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-public @interface DataField {
+@Templated
+public class DependentChild implements IsElement<HTMLDivElement> {
 
-  String value() default "";
+  @Inject
+  @DataField
+  HTMLDivElement root;
 
-  ConflictStrategy strategy() default ConflictStrategy.USE_TEMPLATE;
+  @Override
+  public HTMLDivElement getElement() {
+    return root;
+  }
 }

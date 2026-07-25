@@ -23,28 +23,35 @@ public class Element {
   private final boolean needCast;
   private final boolean elementoIsElement;
   private final boolean isElement;
+  private final boolean useBean;
 
   public Element(String name, String mangledName, String element) {
-    this(name, mangledName, element, false, false, false);
+    this(name, mangledName, element, false, false, false, false);
   }
 
   public Element(String name, String mangledName, String element, boolean needCast) {
-    this(name, mangledName, element, needCast, false, false);
+    this(name, mangledName, element, needCast, false, false, false);
   }
 
   public Element(String name, String mangledName, String element, boolean needCast,
       boolean elementoIsElement) {
-    this(name, mangledName, element, needCast, elementoIsElement, false);
+    this(name, mangledName, element, needCast, elementoIsElement, false, false);
   }
 
   public Element(String name, String mangledName, String element, boolean needCast,
       boolean elementoIsElement, boolean isElement) {
+    this(name, mangledName, element, needCast, elementoIsElement, isElement, false);
+  }
+
+  public Element(String name, String mangledName, String element, boolean needCast,
+      boolean elementoIsElement, boolean isElement, boolean useBean) {
     this.name = name;
     this.mangledName = mangledName;
     this.element = element;
     this.needCast = needCast;
     this.elementoIsElement = elementoIsElement;
     this.isElement = isElement;
+    this.useBean = useBean;
   }
 
   public String getName() {
@@ -69,5 +76,9 @@ public class Element {
 
   public boolean isIsElement() {
     return isElement;
+  }
+
+  public boolean isUseBean() {
+    return useBean;
   }
 }

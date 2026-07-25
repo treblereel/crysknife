@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Treblereel
+ * Copyright © 2026 Treblereel
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -14,19 +14,9 @@
 
 package io.crysknife.ui.templates.client.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public enum ConflictStrategy {
 
-/**
- * @author Dmitrii Tikhomirov Created by treblereel 4/7/19
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-public @interface DataField {
+  USE_TEMPLATE,
 
-  String value() default "";
-
-  ConflictStrategy strategy() default ConflictStrategy.USE_TEMPLATE;
+  USE_BEAN
 }

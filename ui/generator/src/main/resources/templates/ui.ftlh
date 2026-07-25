@@ -41,12 +41,22 @@
            Js.asPropertyMap(instance).set(Reflect.objectProperty("${element.mangledName}", instance), TemplateUtil.resolveElement(instance.getElement(), "${element.name}"));
     </#if>
        } else {
-<#if element.elementoIsElement>
-           TemplateUtil.replaceElement(instance.getElement(), "${element.name}", (elemental2.dom.HTMLElement) ((${element.element?no_esc}) Js.asPropertyMap(instance).get(Reflect.objectProperty("${element.mangledName}", instance))).element());
-<#elseif element.isElement>
-           TemplateUtil.replaceElement(instance.getElement(), "${element.name}", ((io.crysknife.client.IsElement) Js.asPropertyMap(instance).get(Reflect.objectProperty("${element.mangledName}", instance))).getElement());
+<#if element.useBean>
+    <#if element.elementoIsElement>
+           TemplateUtil.replaceElementUseBean(instance.getElement(), "${element.name}", (elemental2.dom.HTMLElement) ((${element.element?no_esc}) Js.asPropertyMap(instance).get(Reflect.objectProperty("${element.mangledName}", instance))).element());
+    <#elseif element.isElement>
+           TemplateUtil.replaceElementUseBean(instance.getElement(), "${element.name}", ((io.crysknife.client.IsElement) Js.asPropertyMap(instance).get(Reflect.objectProperty("${element.mangledName}", instance))).getElement());
+    <#else>
+           TemplateUtil.replaceElementUseBean(instance.getElement(), "${element.name}", ((${element.element?no_esc}) Js.asPropertyMap(instance).get(Reflect.objectProperty("${element.mangledName}", instance))));
+    </#if>
 <#else>
+    <#if element.elementoIsElement>
+           TemplateUtil.replaceElement(instance.getElement(), "${element.name}", (elemental2.dom.HTMLElement) ((${element.element?no_esc}) Js.asPropertyMap(instance).get(Reflect.objectProperty("${element.mangledName}", instance))).element());
+    <#elseif element.isElement>
+           TemplateUtil.replaceElement(instance.getElement(), "${element.name}", ((io.crysknife.client.IsElement) Js.asPropertyMap(instance).get(Reflect.objectProperty("${element.mangledName}", instance))).getElement());
+    <#else>
            TemplateUtil.replaceElement(instance.getElement(), "${element.name}", ((${element.element?no_esc}) Js.asPropertyMap(instance).get(Reflect.objectProperty("${element.mangledName}", instance))));
+    </#if>
 </#if>
        }
 </#list>
