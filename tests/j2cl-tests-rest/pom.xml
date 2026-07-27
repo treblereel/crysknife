@@ -29,7 +29,7 @@
         <j2cl.platform.version>20260527-1</j2cl.platform.version>
         <org.treblereel.j2cl.processors.version>0.10</org.treblereel.j2cl.processors.version>
         <jakarta4g.rest.version>0.1</jakarta4g.rest.version>
-        <mapper.json.version>0.9</mapper.json.version>
+        <mapper.json.version>0.10</mapper.json.version>
         <gwt.jakarta.version>0.8</gwt.jakarta.version>
         <quarkus.version>3.37.0</quarkus.version>
     </properties>

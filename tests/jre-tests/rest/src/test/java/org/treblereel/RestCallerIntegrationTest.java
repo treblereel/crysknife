@@ -15,6 +15,7 @@
 package org.treblereel;
 
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.junit.AfterClass;
@@ -38,7 +39,7 @@ public class RestCallerIntegrationTest {
     public static void startServer() throws Exception {
         UrlBuilder.setEncoder(value -> {
             try {
-                return URLEncoder.encode(value, "UTF-8");
+                return URLEncoder.encode(value, StandardCharsets.UTF_8);
             } catch (Exception e) {
                 return value;
             }
