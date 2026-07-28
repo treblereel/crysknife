@@ -20,6 +20,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
@@ -52,27 +56,127 @@ public class EmbeddedItemServer {
         String method = exchange.getRequestMethod();
         URI uri = exchange.getRequestURI();
         String path = uri.getPath();
-
         String subPath = path.substring("/api/items".length());
 
-        if ("GET".equals(method)) {
-            if (subPath.isEmpty() || subPath.equals("/")) {
-                // GET /api/items -> list all items
-                respondJson(exchange, 200, "[{\"id\":1,\"name\":\"item-1\"},{\"id\":2,\"name\":\"item-2\"}]");
-            } else if (subPath.startsWith("/")) {
-                // GET /api/items/{id}
-                String id = subPath.substring(1);
-                String json = "{\"id\":" + id + ",\"name\":\"item-" + id + "\"}";
-                respondJson(exchange, 200, json);
-            } else {
-                respond(exchange, 404, "");
+        switch (method) {
+            case "GET":
+                handleGet(exchange, subPath, uri);
+                break;
+            case "POST":
+                handlePost(exchange, subPath);
+                break;
+            case "PUT":
+                handlePut(exchange, subPath);
+                break;
+            case "DELETE":
+                handleDelete(exchange, subPath);
+                break;
+            case "PATCH":
+                handlePatch(exchange, subPath);
+                break;
+            default:
+                respond(exchange, 405, "");
+        }
+    }
+
+    private void handleGet(HttpExchange exchange, String subPath, URI uri) throws IOException {
+        if (subPath.isEmpty() || subPath.equals("/")) {
+            respondJson(exchange, 200,
+                    "[{\"id\":1,\"name\":\"item-1\"},{\"id\":2,\"name\":\"item-2\"}]");
+        } else if (subPath.equals("/search")) {
+            Map<String, String> query = parseQueryParams(uri);
+            String name = query.getOrDefault("name", "");
+            respondJson(exchange, 200, "[{\"id\":1,\"name\":\"" + name + "\"}]");
+        } else if (subPath.equals("/search-default")) {
+            Map<String, String> query = parseQueryParams(uri);
+            String page = query.getOrDefault("page", "0");
+            respondJson(exchange, 200,
+                    "[{\"id\":" + page + ",\"name\":\"page-" + page + "\"}]");
+        } else if (subPath.equals("/error/404")) {
+            respondJson(exchange, 404, "{\"error\":\"not found\"}");
+        } else if (subPath.equals("/error/500")) {
+            respondJson(exchange, 500, "{\"error\":\"internal server error\"}");
+        } else if (subPath.matches("/\\d+/header")) {
+            String id = subPath.split("/")[1];
+            String headerValue = exchange.getRequestHeaders().getFirst("X-Custom-Header");
+            if (headerValue == null) {
+                headerValue = "none";
             }
-        } else if ("POST".equals(method)) {
-            // POST /api/items -> echo back the request body with 201
+            respondJson(exchange, 200,
+                    "{\"id\":" + id + ",\"name\":\"" + headerValue + "\"}");
+        } else if (subPath.matches("/\\d+/cookie")) {
+            String id = subPath.split("/")[1];
+            String cookieHeader = exchange.getRequestHeaders().getFirst("Cookie");
+            String sessionValue = "none";
+            if (cookieHeader != null) {
+                for (String part : cookieHeader.split(";")) {
+                    String trimmed = part.trim();
+                    if (trimmed.startsWith("session=")) {
+                        sessionValue = trimmed.substring("session=".length());
+                        break;
+                    }
+                }
+            }
+            respondJson(exchange, 200,
+                    "{\"id\":" + id + ",\"name\":\"" + sessionValue + "\"}");
+        } else if (subPath.matches("/\\d+/related/\\d+")) {
+            String[] parts = subPath.substring(1).split("/");
+            long a = Long.parseLong(parts[0]);
+            long b = Long.parseLong(parts[2]);
+            respondJson(exchange, 200,
+                    "{\"id\":" + (a + b) + ",\"name\":\"related-" + a + "-" + b + "\"}");
+        } else if (subPath.startsWith("/")) {
+            String id = subPath.substring(1);
+            respondJson(exchange, 200,
+                    "{\"id\":" + id + ",\"name\":\"item-" + id + "\"}");
+        } else {
+            respond(exchange, 404, "");
+        }
+    }
+
+    private void handlePost(HttpExchange exchange, String subPath) throws IOException {
+        if (subPath.equals("/form")) {
+            String body = readBody(exchange);
+            Map<String, String> formParams = parseFormBody(body);
+            String id = formParams.getOrDefault("id", "0");
+            String name = formParams.getOrDefault("name", "");
+            respondJson(exchange, 201,
+                    "{\"id\":" + id + ",\"name\":\"" + name + "\"}");
+        } else {
             String body = readBody(exchange);
             respondJson(exchange, 201, body);
+        }
+    }
+
+    private void handlePut(HttpExchange exchange, String subPath) throws IOException {
+        if (subPath.startsWith("/")) {
+            String id = subPath.substring(1);
+            String body = readBody(exchange);
+            String updatedBody = body.replaceFirst("\"id\":\\d+", "\"id\":" + id);
+            respondJson(exchange, 200, updatedBody);
         } else {
-            respond(exchange, 405, "");
+            respond(exchange, 404, "");
+        }
+    }
+
+    private void handleDelete(HttpExchange exchange, String subPath) throws IOException {
+        if (subPath.startsWith("/void/")) {
+            respond(exchange, 204, "");
+        } else if (subPath.startsWith("/")) {
+            String id = subPath.substring(1);
+            respondJson(exchange, 200,
+                    "{\"id\":" + id + ",\"name\":\"deleted-" + id + "\"}");
+        } else {
+            respond(exchange, 404, "");
+        }
+    }
+
+    private void handlePatch(HttpExchange exchange, String subPath) throws IOException {
+        if (subPath.startsWith("/")) {
+            String body = readBody(exchange);
+            respondJson(exchange, 200, body);
+        } else {
+            respond(exchange, 404, "");
         }
     }
 
@@ -102,5 +206,38 @@ public class EmbeddedItemServer {
             }
             return result.toString("UTF-8");
         }
+    }
+
+    private Map<String, String> parseQueryParams(URI uri) {
+        Map<String, String> params = new LinkedHashMap<>();
+        String query = uri.getRawQuery();
+        if (query == null || query.isEmpty()) {
+            return params;
+        }
+        for (String pair : query.split("&")) {
+            int eq = pair.indexOf('=');
+            if (eq > 0) {
+                String key = URLDecoder.decode(pair.substring(0, eq), StandardCharsets.UTF_8);
+                String value = URLDecoder.decode(pair.substring(eq + 1), StandardCharsets.UTF_8);
+                params.put(key, value);
+            }
+        }
+        return params;
+    }
+
+    private Map<String, String> parseFormBody(String body) {
+        Map<String, String> params = new LinkedHashMap<>();
+        if (body == null || body.isEmpty()) {
+            return params;
+        }
+        for (String pair : body.split("&")) {
+            int eq = pair.indexOf('=');
+            if (eq > 0) {
+                String key = URLDecoder.decode(pair.substring(0, eq), StandardCharsets.UTF_8);
+                String value = URLDecoder.decode(pair.substring(eq + 1), StandardCharsets.UTF_8);
+                params.put(key, value);
+            }
+        }
+        return params;
     }
 }
