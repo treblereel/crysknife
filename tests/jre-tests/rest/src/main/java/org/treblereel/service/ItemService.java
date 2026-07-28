@@ -92,6 +92,14 @@ public interface ItemService {
     Item getRelatedItem(@PathParam("a") long a, @PathParam("b") long b);
 
     @GET
+    @Path("/auth-echo")
+    Item getAuthEcho();
+
+    @GET
+    @Path("/protected")
+    Item getProtected();
+
+    @GET
     @Path("/error/404")
     Item getError404();
 
