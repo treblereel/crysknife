@@ -359,6 +359,189 @@ public class RestIntegrationTest {
         assertEquals("", getResultText("delete-item-result"));
     }
 
+    // --- Nested Model ---
+
+    @Test
+    void testDetailedItemButtonPresent() {
+        assertNotNull(driver.findElement(By.id("detailed-item-btn")));
+        assertNotNull(driver.findElement(By.id("detailed-item-result")));
+    }
+
+    @Test
+    void testDetailedItem() {
+        clickAndWaitForResult("detailed-item-btn", "detailed-item-result");
+        assertEquals("1:detailed-1:10:electronics", getResultText("detailed-item-result"));
+    }
+
+    @Test
+    void testDetailedItemNoError() {
+        clickAndWaitForResult("detailed-item-btn", "detailed-item-result");
+        assertFalse(getResultText("detailed-item-result").startsWith("ERROR:"));
+    }
+
+    @Test
+    void testDetailedItemContainsNestedCategory() {
+        clickAndWaitForResult("detailed-item-btn", "detailed-item-result");
+        String result = getResultText("detailed-item-result");
+        assertTrue(result.contains("electronics"), "Result should contain nested category name");
+    }
+
+    // --- Empty List ---
+
+    @Test
+    void testSearchEmptyButtonPresent() {
+        assertNotNull(driver.findElement(By.id("search-empty-btn")));
+        assertNotNull(driver.findElement(By.id("search-empty-result")));
+    }
+
+    @Test
+    void testSearchEmpty() {
+        clickAndWaitForResult("search-empty-btn", "search-empty-result");
+        assertEquals("EMPTY:0", getResultText("search-empty-result"));
+    }
+
+    @Test
+    void testSearchEmptyNoError() {
+        clickAndWaitForResult("search-empty-btn", "search-empty-result");
+        assertFalse(getResultText("search-empty-result").startsWith("ERROR:"));
+    }
+
+    // --- Void Endpoint ---
+
+    @Test
+    void testDeleteVoidButtonPresent() {
+        assertNotNull(driver.findElement(By.id("delete-void-btn")));
+        assertNotNull(driver.findElement(By.id("delete-void-result")));
+    }
+
+    @Test
+    void testDeleteVoidResultStartsEmpty() {
+        assertEquals("", getResultText("delete-void-result"));
+    }
+
+    @Test
+    void testDeleteVoid() {
+        clickAndWaitForResult("delete-void-btn", "delete-void-result");
+        assertEquals("VOID_OK", getResultText("delete-void-result"));
+    }
+
+    @Test
+    void testDeleteVoidNoError() {
+        clickAndWaitForResult("delete-void-btn", "delete-void-result");
+        assertFalse(getResultText("delete-void-result").startsWith("ERROR:"));
+    }
+
+    // --- FullResponseCallback ---
+
+    @Test
+    void testFullResponseButtonPresent() {
+        assertNotNull(driver.findElement(By.id("full-response-btn")));
+        assertNotNull(driver.findElement(By.id("full-response-result")));
+    }
+
+    @Test
+    void testFullResponseResultStartsEmpty() {
+        assertEquals("", getResultText("full-response-result"));
+    }
+
+    @Test
+    void testFullResponse() {
+        clickAndWaitForResult("full-response-btn", "full-response-result");
+        assertEquals("200:1:item-1", getResultText("full-response-result"));
+    }
+
+    @Test
+    void testFullResponseNoError() {
+        clickAndWaitForResult("full-response-btn", "full-response-result");
+        assertFalse(getResultText("full-response-result").startsWith("ERROR:"));
+    }
+
+    @Test
+    void testFullResponseContainsStatusCode() {
+        clickAndWaitForResult("full-response-btn", "full-response-result");
+        assertTrue(getResultText("full-response-result").startsWith("200:"));
+    }
+
+    // --- HTTP Error Handling ---
+
+    @Test
+    void testError404ButtonPresent() {
+        assertNotNull(driver.findElement(By.id("error-404-btn")));
+        assertNotNull(driver.findElement(By.id("error-404-result")));
+    }
+
+    @Test
+    void testError500ButtonPresent() {
+        assertNotNull(driver.findElement(By.id("error-500-btn")));
+        assertNotNull(driver.findElement(By.id("error-500-result")));
+    }
+
+    @Test
+    void testError404() {
+        clickAndWaitForResult("error-404-btn", "error-404-result");
+        assertEquals("404", getResultText("error-404-result"));
+    }
+
+    @Test
+    void testError500() {
+        clickAndWaitForResult("error-500-btn", "error-500-result");
+        assertEquals("500", getResultText("error-500-result"));
+    }
+
+    @Test
+    void testError404DoesNotShowOK() {
+        clickAndWaitForResult("error-404-btn", "error-404-result");
+        assertFalse(getResultText("error-404-result").equals("OK"),
+                "Success callback should not be called for 404");
+    }
+
+    @Test
+    void testError500DoesNotShowOK() {
+        clickAndWaitForResult("error-500-btn", "error-500-result");
+        assertFalse(getResultText("error-500-result").equals("OK"),
+                "Success callback should not be called for 500");
+    }
+
+    // --- Promise API ---
+
+    @Test
+    void testPromiseButtonsPresent() {
+        assertNotNull(driver.findElement(By.id("promise-get-item-btn")));
+        assertNotNull(driver.findElement(By.id("promise-get-item-result")));
+        assertNotNull(driver.findElement(By.id("promise-list-items-btn")));
+        assertNotNull(driver.findElement(By.id("promise-list-items-result")));
+    }
+
+    @Test
+    void testPromiseResultsStartEmpty() {
+        assertEquals("", getResultText("promise-get-item-result"));
+        assertEquals("", getResultText("promise-list-items-result"));
+    }
+
+    @Test
+    void testPromiseGetItem() {
+        clickAndWaitForResult("promise-get-item-btn", "promise-get-item-result");
+        assertEquals("1:item-1", getResultText("promise-get-item-result"));
+    }
+
+    @Test
+    void testPromiseGetItemNoError() {
+        clickAndWaitForResult("promise-get-item-btn", "promise-get-item-result");
+        assertFalse(getResultText("promise-get-item-result").startsWith("ERROR:"));
+    }
+
+    @Test
+    void testPromiseListItems() {
+        clickAndWaitForResult("promise-list-items-btn", "promise-list-items-result");
+        assertEquals("2", getResultText("promise-list-items-result"));
+    }
+
+    @Test
+    void testPromiseListItemsNoError() {
+        clickAndWaitForResult("promise-list-items-btn", "promise-list-items-result");
+        assertFalse(getResultText("promise-list-items-result").startsWith("ERROR:"));
+    }
+
     // --- External API (JSONPlaceholder, qualifier test) ---
 
     @Test

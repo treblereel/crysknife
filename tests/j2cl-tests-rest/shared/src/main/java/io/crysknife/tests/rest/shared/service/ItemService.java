@@ -15,6 +15,7 @@ package io.crysknife.tests.rest.shared.service;
 
 import java.util.List;
 
+import io.crysknife.tests.rest.shared.model.DetailedItem;
 import io.crysknife.tests.rest.shared.model.Item;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -59,4 +60,23 @@ public interface ItemService {
   @Path("/search")
   @Produces(MediaType.APPLICATION_JSON)
   List<Item> searchItems(@QueryParam("name") String name);
+
+  @GET
+  @Path("/detailed/{id}")
+  @Produces(MediaType.APPLICATION_JSON)
+  DetailedItem getDetailedItem(@PathParam("id") long id);
+
+  @DELETE
+  @Path("/void/{id}")
+  void deleteItemVoid(@PathParam("id") long id);
+
+  @GET
+  @Path("/error/404")
+  @Produces(MediaType.APPLICATION_JSON)
+  Item getError404();
+
+  @GET
+  @Path("/error/500")
+  @Produces(MediaType.APPLICATION_JSON)
+  Item getError500();
 }

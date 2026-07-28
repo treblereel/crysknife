@@ -30,6 +30,8 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import io.crysknife.tests.rest.shared.model.Category;
+import io.crysknife.tests.rest.shared.model.DetailedItem;
 import io.crysknife.tests.rest.shared.model.Item;
 
 @Path("/api/items")
@@ -96,5 +98,36 @@ public class ItemResource {
         return STORE.stream()
             .filter(i -> i.getName().contains(name))
             .collect(Collectors.toList());
+    }
+
+    @GET
+    @Path("/detailed/{id}")
+    public DetailedItem getDetailedItem(@PathParam("id") long id) {
+        Category category = new Category();
+        category.setId(10);
+        category.setName("electronics");
+        DetailedItem item = new DetailedItem();
+        item.setId(id);
+        item.setName("detailed-" + id);
+        item.setCategory(category);
+        return item;
+    }
+
+    @DELETE
+    @Path("/void/{id}")
+    public Response deleteItemVoid(@PathParam("id") long id) {
+        return Response.noContent().build();
+    }
+
+    @GET
+    @Path("/error/404")
+    public Response getError404() {
+        return Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+    @GET
+    @Path("/error/500")
+    public Response getError500() {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
 }
