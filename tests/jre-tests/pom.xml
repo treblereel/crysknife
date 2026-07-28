@@ -16,6 +16,21 @@
         <module>rest</module>
     </modules>
 
+    <profiles>
+        <profile>
+            <id>keycloak-tests</id>
+            <activation>
+                <property>
+                    <name>keycloak.tests</name>
+                </property>
+            </activation>
+            <modules>
+                <module>rest-keycloak-api</module>
+                <module>rest-keycloak</module>
+            </modules>
+        </profile>
+    </profiles>
+
     <build>
         <plugins>
             <plugin>
