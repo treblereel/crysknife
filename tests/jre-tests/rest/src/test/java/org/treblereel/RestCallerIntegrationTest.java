@@ -23,15 +23,25 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.treblereel.config.TestRestConfig;
+import org.treblereel.gwt.rest.client.Caller;
+import org.treblereel.gwt.rest.client.NotFoundException;
+import org.treblereel.gwt.rest.client.RestConfig;
+import org.treblereel.gwt.rest.client.RestException;
 import org.treblereel.gwt.rest.client.RestResponse;
+import org.treblereel.gwt.rest.client.RetryPolicy;
+import org.treblereel.gwt.rest.client.UnauthorizedException;
 import org.treblereel.gwt.rest.client.proxy.UrlBuilder;
 import org.treblereel.model.Item;
 import org.treblereel.server.EmbeddedItemServer;
+import org.treblereel.service.ItemService;
+import org.treblereel.service.ItemService_RestCaller;
+import org.treblereel.transport.JdkTransport;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class RestCallerIntegrationTest {
 
@@ -276,5 +286,307 @@ public class RestCallerIntegrationTest {
         assertNotNull(errorResponse[0]);
         assertEquals(500, errorResponse[0].getStatusCode());
         assertNull(successResult[0]);
+    }
+
+    // --- Bearer Token ---
+
+    private Caller<ItemService> callerWith(RestConfig config) {
+        return new ItemService_RestCaller(config);
+    }
+
+    private RestConfig.Builder baseConfigBuilder() {
+        return RestConfig.builder()
+                .baseUrl(server.getBaseUrl())
+                .transport(new JdkTransport());
+    }
+
+    @Test
+    public void testBearerTokenStatic() {
+        Caller<ItemService> caller = callerWith(
+                baseConfigBuilder().bearerToken("my-secret-token").build());
+
+        Item[] result = new Item[1];
+        caller.call(r -> result[0] = (Item) r).getAuthEcho();
+
+        assertNotNull(result[0]);
+        assertEquals("Bearer my-secret-token", result[0].getName());
+    }
+
+    @Test
+    public void testBearerTokenDynamic() {
+        String[] currentToken = {"token-v1"};
+        Caller<ItemService> caller = callerWith(
+                baseConfigBuilder().bearerToken(() -> currentToken[0]).build());
+
+        Item[] result = new Item[1];
+        caller.call(r -> result[0] = (Item) r).getAuthEcho();
+        assertEquals("Bearer token-v1", result[0].getName());
+
+        currentToken[0] = "token-v2";
+        caller.call(r -> result[0] = (Item) r).getAuthEcho();
+        assertEquals("Bearer token-v2", result[0].getName());
+    }
+
+    @Test
+    public void testBearerTokenNullSkipsHeader() {
+        Caller<ItemService> caller = callerWith(
+                baseConfigBuilder().bearerToken(() -> null).build());
+
+        Item[] result = new Item[1];
+        caller.call(r -> result[0] = (Item) r).getAuthEcho();
+
+        assertNotNull(result[0]);
+        assertEquals("none", result[0].getName());
+    }
+
+    // --- Default Headers ---
+
+    @Test
+    public void testDefaultHeaders() {
+        Caller<ItemService> caller = callerWith(
+                baseConfigBuilder()
+                        .header("X-Custom-Header", "from-default")
+                        .build());
+
+        Item[] result = new Item[1];
+        caller.call(r -> result[0] = (Item) r).getItemWithHeader(1, null);
+
+        assertNotNull(result[0]);
+        assertEquals("from-default", result[0].getName());
+    }
+
+    // --- Request Filter ---
+
+    @Test
+    public void testRequestFilterAddsHeader() {
+        Caller<ItemService> caller = callerWith(
+                baseConfigBuilder()
+                        .requestFilter(ctx ->
+                                ctx.getHeaders().put("X-Custom-Header", "from-filter"))
+                        .build());
+
+        Item[] result = new Item[1];
+        caller.call(r -> result[0] = (Item) r).getItemWithHeader(1, null);
+
+        assertNotNull(result[0]);
+        assertEquals("from-filter", result[0].getName());
+    }
+
+    @Test
+    public void testRequestFilterOverridesBearerToken() {
+        Caller<ItemService> caller = callerWith(
+                baseConfigBuilder()
+                        .bearerToken("original-token")
+                        .requestFilter(ctx ->
+                                ctx.getHeaders().put("Authorization", "Bearer replaced-token"))
+                        .build());
+
+        Item[] result = new Item[1];
+        caller.call(r -> result[0] = (Item) r).getAuthEcho();
+
+        assertNotNull(result[0]);
+        assertEquals("Bearer replaced-token", result[0].getName());
+    }
+
+    // --- Response Filter ---
+
+    @Test
+    public void testResponseFilterSeesStatusCode() {
+        int[] capturedStatus = {0};
+        Caller<ItemService> caller = callerWith(
+                baseConfigBuilder()
+                        .responseFilter((reqCtx, respCtx) ->
+                                capturedStatus[0] = respCtx.getStatusCode())
+                        .build());
+
+        Item[] result = new Item[1];
+        caller.call(r -> result[0] = (Item) r).getItem(1);
+
+        assertEquals(200, capturedStatus[0]);
+        assertNotNull(result[0]);
+    }
+
+    // --- Retry on 401 with token refresh ---
+
+    @Test
+    public void testRetryOn401WithTokenRefresh() {
+        String[] currentToken = {"expired-token"};
+
+        Caller<ItemService> caller = callerWith(
+                baseConfigBuilder()
+                        .bearerToken(() -> currentToken[0])
+                        .retryPolicy(RetryPolicy.builder()
+                                .maxRetries(1)
+                                .delayMs(0)
+                                .condition((response, error, attempt) ->
+                                        response != null && response.getStatusCode() == 401)
+                                .build())
+                        .responseFilter((reqCtx, respCtx) -> {
+                            if (respCtx.getStatusCode() == 401) {
+                                currentToken[0] = "refreshed-token";
+                            }
+                        })
+                        .build());
+
+        Item[] result = new Item[1];
+        RestResponse[] errorResponse = new RestResponse[1];
+        caller.onError((resp, t) -> errorResponse[0] = resp)
+                .call(r -> result[0] = (Item) r)
+                .getProtected();
+
+        assertNotNull(result[0]);
+        assertEquals("protected-data", result[0].getName());
+        assertNull(errorResponse[0]);
+    }
+
+    // --- ExceptionMapper ---
+
+    @Test
+    public void testExceptionMapperOn404() {
+        Caller<ItemService> caller = callerWith(
+                baseConfigBuilder()
+                        .exceptionMapper(response -> {
+                            if (response.getStatusCode() == 404) {
+                                return new NotFoundException(response);
+                            }
+                            return null;
+                        })
+                        .build());
+
+        Throwable[] captured = new Throwable[1];
+        caller.onError((resp, throwable) -> captured[0] = throwable)
+                .call(r -> fail("should not succeed"))
+                .getError404();
+
+        assertNotNull(captured[0]);
+        assertTrue(captured[0] instanceof NotFoundException);
+        assertEquals(404, ((NotFoundException) captured[0]).getResponse().getStatusCode());
+    }
+
+    @Test
+    public void testExceptionMapperOn401() {
+        Caller<ItemService> caller = callerWith(
+                baseConfigBuilder()
+                        .exceptionMapper(response -> {
+                            if (response.getStatusCode() == 401) {
+                                return new UnauthorizedException(response);
+                            }
+                            return null;
+                        })
+                        .build());
+
+        Throwable[] captured = new Throwable[1];
+        caller.onError((resp, throwable) -> captured[0] = throwable)
+                .call(r -> fail("should not succeed"))
+                .getProtected();
+
+        assertNotNull(captured[0]);
+        assertTrue(captured[0] instanceof UnauthorizedException);
+    }
+
+    @Test
+    public void testExceptionMapperReturnsNullFallsBackToRestException() {
+        Caller<ItemService> caller = callerWith(
+                baseConfigBuilder()
+                        .exceptionMapper(response -> null)
+                        .build());
+
+        Throwable[] captured = new Throwable[1];
+        caller.onError((resp, throwable) -> captured[0] = throwable)
+                .call(r -> fail("should not succeed"))
+                .getError500();
+
+        assertNotNull(captured[0]);
+        assertTrue(captured[0] instanceof RestException);
+        assertTrue(captured[0].getMessage().contains("500"));
+    }
+
+    @Test
+    public void testNoExceptionMapperDefaultsToRestException() {
+        Caller<ItemService> caller = callerWith(baseConfigBuilder().build());
+
+        Throwable[] captured = new Throwable[1];
+        caller.onError((resp, throwable) -> captured[0] = throwable)
+                .call(r -> fail("should not succeed"))
+                .getError404();
+
+        assertNotNull(captured[0]);
+        assertTrue(captured[0] instanceof RestException);
+    }
+
+    // --- Request Abort via Filter ---
+
+    @Test
+    public void testRequestFilterAbortPreventsHttpCall() {
+        RestResponse fakeResponse = new RestResponse(
+                403, "Forbidden", "{\"id\":0,\"name\":\"blocked\"}", java.util.Collections.emptyMap());
+
+        Caller<ItemService> caller = callerWith(
+                baseConfigBuilder()
+                        .requestFilter(ctx -> ctx.abortWith(fakeResponse))
+                        .build());
+
+        Throwable[] captured = new Throwable[1];
+        caller.onError((resp, throwable) -> captured[0] = throwable)
+                .call(r -> fail("should not succeed"))
+                .getItem(1);
+
+        assertNotNull(captured[0]);
+        assertTrue(captured[0] instanceof RestException);
+        assertTrue(captured[0].getMessage().contains("403"));
+    }
+
+    @Test
+    public void testRequestFilterAbortWith200DeliversSuccessfully() {
+        RestResponse fakeResponse = new RestResponse(
+                200, "OK", "{\"id\":42,\"name\":\"cached\"}", java.util.Collections.emptyMap());
+
+        Caller<ItemService> caller = callerWith(
+                baseConfigBuilder()
+                        .requestFilter(ctx -> ctx.abortWith(fakeResponse))
+                        .build());
+
+        Item[] result = new Item[1];
+        caller.call(r -> result[0] = (Item) r).getItem(1);
+
+        assertNotNull(result[0]);
+        assertEquals(42, result[0].getId());
+        assertEquals("cached", result[0].getName());
+    }
+
+    // --- RestPromise API ---
+
+    @Test
+    public void testPromiseGetItem() {
+        ItemService_RestCaller caller = new ItemService_RestCaller(baseConfigBuilder().build());
+
+        Item[] result = new Item[1];
+        caller.promiseGetItem(1).then(item -> result[0] = item);
+
+        assertNotNull(result[0]);
+        assertEquals(1, result[0].getId());
+        assertEquals("item-1", result[0].getName());
+    }
+
+    @Test
+    public void testPromiseListItems() {
+        ItemService_RestCaller caller = new ItemService_RestCaller(baseConfigBuilder().build());
+
+        List<Item>[] result = new List[1];
+        caller.promiseListItems().then(items -> result[0] = items);
+
+        assertNotNull(result[0]);
+        assertEquals(2, result[0].size());
+    }
+
+    @Test
+    public void testPromiseError() {
+        ItemService_RestCaller caller = new ItemService_RestCaller(baseConfigBuilder().build());
+
+        Throwable[] captured = new Throwable[1];
+        caller.promiseGetError404().catchError(t -> captured[0] = t);
+
+        assertNotNull(captured[0]);
+        assertTrue(captured[0] instanceof RestException);
     }
 }

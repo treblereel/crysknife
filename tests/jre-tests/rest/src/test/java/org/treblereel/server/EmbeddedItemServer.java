@@ -92,6 +92,19 @@ public class EmbeddedItemServer {
             String page = query.getOrDefault("page", "0");
             respondJson(exchange, 200,
                     "[{\"id\":" + page + ",\"name\":\"page-" + page + "\"}]");
+        } else if (subPath.equals("/auth-echo")) {
+            String auth = exchange.getRequestHeaders().getFirst("Authorization");
+            if (auth == null) {
+                auth = "none";
+            }
+            respondJson(exchange, 200, "{\"id\":0,\"name\":\"" + auth + "\"}");
+        } else if (subPath.equals("/protected")) {
+            String auth = exchange.getRequestHeaders().getFirst("Authorization");
+            if ("Bearer refreshed-token".equals(auth)) {
+                respondJson(exchange, 200, "{\"id\":1,\"name\":\"protected-data\"}");
+            } else {
+                respondJson(exchange, 401, "{\"error\":\"unauthorized\"}");
+            }
         } else if (subPath.equals("/error/404")) {
             respondJson(exchange, 404, "{\"error\":\"not found\"}");
         } else if (subPath.equals("/error/500")) {
