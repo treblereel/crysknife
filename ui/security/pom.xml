@@ -3,15 +3,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>io.crysknife</groupId>
-    <artifactId>crysknife-parent</artifactId>
+    <groupId>io.crysknife.ui</groupId>
+    <artifactId>parent</artifactId>
     <version>0.10</version>
   </parent>
 
-  <groupId>io.crysknife.ui</groupId>
-  <artifactId>parent</artifactId>
-  <name>Crysknife :: UI</name>
-  <description>UI modules parent</description>
+  <artifactId>crysknife-ui-security-parent</artifactId>
+  <name>Crysknife :: UI :: Security</name>
+  <description>Security module for crysknife</description>
   <packaging>pom</packaging>
 
   <developers>
@@ -21,14 +20,6 @@
       <email>chani.liet@gmail.com</email>
     </developer>
   </developers>
-
-  <modules>
-    <module>core</module>
-    <module>generator</module>
-    <module>databinding</module>
-    <module>rest</module>
-    <module>security</module>
-  </modules>
 
   <licenses>
     <license>
@@ -42,5 +33,9 @@
     <name>Treblereel</name>
     <url>https://github.com/treblereel</url>
   </organization>
+
+  <modules>
+    <module>api</module>
+  </modules>
 
 </project>

@@ -23,6 +23,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.security.DenyAll;
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Event;
 import jakarta.enterprise.inject.Specializes;
@@ -46,11 +49,15 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.AssignExpr;
+import com.github.javaparser.ast.expr.CastExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
+import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
+import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.google.auto.common.MoreElements;
@@ -64,8 +71,10 @@ import io.crysknife.generator.context.IOCContext;
 import io.crysknife.logger.TreeLogger;
 import io.crysknife.ui.navigation.client.DefaultPage;
 import io.crysknife.ui.navigation.client.HistoryToken;
+import io.crysknife.ui.navigation.client.LoginPage;
 import io.crysknife.ui.navigation.client.NavigationEvent;
 import io.crysknife.ui.navigation.client.PageRequest;
+import io.crysknife.ui.navigation.client.SecurityError;
 import io.crysknife.ui.navigation.client.annotation.Page;
 import io.crysknife.ui.navigation.client.annotation.PageHidden;
 import io.crysknife.ui.navigation.client.annotation.PageHiding;
@@ -75,6 +84,7 @@ import io.crysknife.ui.navigation.client.annotation.PageState;
 import io.crysknife.ui.navigation.client.internal.NavigationControl;
 import io.crysknife.ui.navigation.client.internal.NavigationGraph;
 import io.crysknife.ui.navigation.client.internal.PageNode;
+import io.crysknife.ui.security.SecurityContext;
 import io.crysknife.util.GenerationUtils;
 
 /**
@@ -129,6 +139,9 @@ public class NavigationGraphGenerator {
         compilationUnit.addImport(Event.class);
         compilationUnit.addImport(ApplicationScoped.class);
         compilationUnit.addImport(Specializes.class);
+        compilationUnit.addImport(SecurityContext.class);
+        compilationUnit.addImport(LoginPage.class);
+        compilationUnit.addImport(SecurityError.class);
 
 
         classDeclaration.getExtendedTypes().add(new ClassOrInterfaceType().setName("NavigationGraph"));
@@ -406,6 +419,8 @@ public class NavigationGraphGenerator {
         method.addParameter(HistoryToken.class.getSimpleName(), "state");
         method.addParameter(NavigationControl.class.getSimpleName(), "control");
 
+        generateSecurityGuard(page, method);
+
         ObjectCreationExpr mapCreationExpr = new ObjectCreationExpr()
                 .setType(new ClassOrInterfaceType().setName(HashMap.class.getSimpleName()));
 
@@ -436,6 +451,74 @@ public class NavigationGraphGenerator {
         method.getBody().ifPresent(
                 body -> body.addAndGetStatement(new MethodCallExpr(new NameExpr("control"), "proceed")));
         anonymousClassBody.add(method);
+    }
+
+    private void generateSecurityGuard(TypeElement page, MethodDeclaration method) {
+        DenyAll denyAll = page.getAnnotation(DenyAll.class);
+        PermitAll permitAll = page.getAnnotation(PermitAll.class);
+        RolesAllowed rolesAllowed = page.getAnnotation(RolesAllowed.class);
+
+        if (denyAll == null && rolesAllowed == null) {
+            return;
+        }
+
+        if (permitAll != null) {
+            return;
+        }
+
+        method.getBody().ifPresent(body -> {
+            // SecurityContext _secCtx = (SecurityContext) beanManager.lookupBean(SecurityContext.class).getInstance();
+            CastExpr castExpr = new CastExpr(
+                    new ClassOrInterfaceType().setName("SecurityContext"),
+                    new MethodCallExpr(
+                            new MethodCallExpr(new NameExpr("beanManager"), "lookupBean")
+                                    .addArgument("SecurityContext.class"),
+                            "getInstance"));
+            body.addAndGetStatement(new AssignExpr()
+                    .setTarget(new VariableDeclarationExpr(
+                            new ClassOrInterfaceType().setName("SecurityContext"), "_secCtx"))
+                    .setValue(castExpr));
+
+            if (denyAll != null) {
+                // @DenyAll: always redirect to SecurityError
+                body.addAndGetStatement(
+                        new MethodCallExpr(new NameExpr("control"), "redirectToRole")
+                                .addArgument("SecurityError.class"));
+                body.addAndGetStatement(new ReturnStmt());
+            } else {
+                // @RolesAllowed: check login, then check roles
+                String[] roles = rolesAllowed.value();
+
+                // if (!_secCtx.isLoggedIn()) { control.redirectToRole(LoginPage.class); return; }
+                BlockStmt loginBlock = new BlockStmt();
+                loginBlock.addStatement(
+                        new MethodCallExpr(new NameExpr("control"), "redirectToRole")
+                                .addArgument("LoginPage.class"));
+                loginBlock.addStatement(new ReturnStmt());
+
+                body.addAndGetStatement(new IfStmt(
+                        new UnaryExpr(
+                                new MethodCallExpr(new NameExpr("_secCtx"), "isLoggedIn"),
+                                UnaryExpr.Operator.LOGICAL_COMPLEMENT),
+                        loginBlock, null));
+
+                // if (!_secCtx.isUserInAllRoles("role1", "role2")) { control.redirectToRole(SecurityError.class); return; }
+                MethodCallExpr rolesCheck = new MethodCallExpr(new NameExpr("_secCtx"), "isUserInAllRoles");
+                for (String role : roles) {
+                    rolesCheck.addArgument(new StringLiteralExpr(role));
+                }
+
+                BlockStmt rolesBlock = new BlockStmt();
+                rolesBlock.addStatement(
+                        new MethodCallExpr(new NameExpr("control"), "redirectToRole")
+                                .addArgument("SecurityError.class"));
+                rolesBlock.addStatement(new ReturnStmt());
+
+                body.addAndGetStatement(new IfStmt(
+                        new UnaryExpr(rolesCheck, UnaryExpr.Operator.LOGICAL_COMPLEMENT),
+                        rolesBlock, null));
+            }
+        });
     }
 
     private void appendPageShownMethod(TypeElement page, String pageName,
