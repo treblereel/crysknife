@@ -15,11 +15,13 @@
 package io.crysknife.ui.templates.generator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
@@ -48,6 +50,7 @@ import elemental2.dom.HTMLElement;
 import io.crysknife.client.Reflect;
 import io.crysknife.generator.context.IOCContext;
 import io.crysknife.logger.TreeLogger;
+import io.crysknife.ui.security.IfRole;
 import io.crysknife.ui.templates.client.annotation.DataField;
 import io.crysknife.ui.templates.generator.dto.TemplateDefinition;
 import io.crysknife.util.TypeUtils;
@@ -158,10 +161,11 @@ public class DataFieldGenerator {
             boolean isCrysknifeIsElement =
                     element.getKind() == DataElementInfo.Kind.IsElement;
             boolean useBean = "USE_BEAN".equals(element.getStrategy());
+            List<String> roles = getIfRoleValues(element.getField());
             io.crysknife.ui.templates.generator.dto.Element elementDto =
                     new io.crysknife.ui.templates.generator.dto.Element(element.getSelector(), mangleName,
                             element.getType().toString(), element.needsCast(), isElemento,
-                            isCrysknifeIsElement, useBean);
+                            isCrysknifeIsElement, useBean, roles);
 
             templateDefinition.getElements().add(elementDto);
         }
@@ -257,6 +261,26 @@ public class DataFieldGenerator {
             }
         }
         return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<String> getIfRoleValues(VariableElement field) {
+        Optional<AnnotationMirror> annotationMirror =
+                MoreElements.getAnnotationMirror(field, IfRole.class).toJavaUtil();
+        if (annotationMirror.isPresent()) {
+            Map<? extends ExecutableElement, ? extends AnnotationValue> values = processingEnvironment
+                    .getElementUtils().getElementValuesWithDefaults(annotationMirror.get());
+            for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : values.entrySet()) {
+                if (entry.getKey().getSimpleName().toString().equals("value")) {
+                    List<? extends AnnotationValue> roleValues =
+                            (List<? extends AnnotationValue>) entry.getValue().getValue();
+                    return roleValues.stream()
+                            .map(v -> String.valueOf(v.getValue()))
+                            .collect(Collectors.toList());
+                }
+            }
+        }
+        return Collections.emptyList();
     }
 
     private void abortWithError(Element element, String msg, Object... args) {

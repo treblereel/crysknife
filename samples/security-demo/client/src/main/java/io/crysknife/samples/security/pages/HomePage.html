@@ -14,4 +14,12 @@
     <tr><td>user1</td><td>password1</td><td>user</td></tr>
     <tr><td>admin1</td><td>password1</td><td>user, admin</td></tr>
   </table>
+
+  <div data-field="userSection" style="margin-top:1rem; padding:1rem; background:#e8f5e9; border-radius:4px;">
+    <strong>User Section</strong> — visible only to users with <code>"user"</code> role (<code>@IfRole("user")</code>)
+  </div>
+
+  <div data-field="adminPanel" style="margin-top:1rem; padding:1rem; background:#fff3e0; border-radius:4px;">
+    <strong>Admin Panel</strong> — visible only to users with <code>"admin"</code> role (<code>@IfRole("admin")</code>)
+  </div>
 </div>

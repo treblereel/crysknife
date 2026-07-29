@@ -16,12 +16,16 @@
 
 package io.crysknife.ui.security;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class SecurityContext {
 
   private User currentUser = User.ANONYMOUS;
+  private final List<Runnable> changeListeners = new ArrayList<>();
 
   public User getUser() {
     return currentUser;
@@ -29,6 +33,11 @@ public class SecurityContext {
 
   public void setUser(User user) {
     this.currentUser = user != null ? user : User.ANONYMOUS;
+    changeListeners.forEach(Runnable::run);
+  }
+
+  public void addChangeListener(Runnable listener) {
+    changeListeners.add(listener);
   }
 
   public boolean isLoggedIn() {
