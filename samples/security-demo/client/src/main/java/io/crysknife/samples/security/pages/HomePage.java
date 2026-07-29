@@ -23,6 +23,7 @@ import elemental2.dom.HTMLDivElement;
 import io.crysknife.client.IsElement;
 import io.crysknife.ui.navigation.client.DefaultPage;
 import io.crysknife.ui.navigation.client.annotation.Page;
+import io.crysknife.ui.security.IfRole;
 import io.crysknife.ui.templates.client.annotation.DataField;
 import io.crysknife.ui.templates.client.annotation.Templated;
 
@@ -34,6 +35,16 @@ public class HomePage implements IsElement<HTMLDivElement> {
   @Inject
   @DataField
   HTMLDivElement root;
+
+  @Inject
+  @DataField
+  @IfRole("user")
+  HTMLDivElement userSection;
+
+  @Inject
+  @DataField
+  @IfRole("admin")
+  HTMLDivElement adminPanel;
 
   @Override
   public HTMLDivElement getElement() {

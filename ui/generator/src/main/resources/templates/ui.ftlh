@@ -59,6 +59,19 @@
     </#if>
 </#if>
        }
+<#if element.roles?has_content>
+       {
+           io.crysknife.ui.security.SecurityContext _secCtx = (io.crysknife.ui.security.SecurityContext) beanManager.lookupBean(io.crysknife.ui.security.SecurityContext.class).getInstance();
+           elemental2.dom.HTMLElement _el = (elemental2.dom.HTMLElement) Js.asPropertyMap(instance).get(Reflect.objectProperty("${element.mangledName}", instance));
+           if (_el != null) {
+               Runnable _guard = () -> {
+                   _el.style.display = _secCtx.isUserInAllRoles(<#list element.roles as role>"${role}"<#if role?has_next>, </#if></#list>) ? "" : "none";
+               };
+               _guard.run();
+               _secCtx.addChangeListener(_guard);
+           }
+       }
+</#if>
 </#list>
 
 <#list events as event>
