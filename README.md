@@ -63,6 +63,7 @@
     - [3.4.7.1. SecurityContext](#3471-securitycontext)
     - [3.4.7.2. @RolesAllowed and @DenyAll](#3472-rolesallowed-and-denyall)
     - [3.4.7.3. LoginPage and SecurityError Roles](#3473-loginpage-and-securityerror-roles)
+    - [3.4.7.4. @IfRole — Element-Level Security](#3474-ifrole--element-level-security)
 - [3.5. Data Binding](#35-data-binding)
   - [3.5.1. @Bindable Models](#351-bindable-models)
   - [3.5.2. @Bound Fields](#352-bound-fields)
@@ -1293,6 +1294,7 @@ Key methods:
 * `getUser()` — returns the current `User`
 * `setUser(User user)` — sets the authenticated user
 * `reset()` — clears the user (logout)
+* `addChangeListener(Runnable listener)` — registers a callback invoked whenever `setUser()` is called (useful for reactive UI updates)
 
 #### 3.4.7.2. @RolesAllowed and @DenyAll
 
@@ -1352,6 +1354,47 @@ public class AccessDeniedPage implements IsElement<HTMLDivElement> {
 ```
 
 `LoginPage` and `SecurityError` are `UniquePageRole` markers from `io.crysknife.ui.navigation.client`. Each application using security guards must have exactly one page for each role.
+
+#### 3.4.7.4. @IfRole — Element-Level Security
+
+While `@RolesAllowed` and `@DenyAll` protect entire pages, `@IfRole` provides fine-grained control over individual DOM elements within a page. It hides or shows `@DataField` elements based on the current user's roles.
+
+```java
+@Page(path = "home")
+@Templated
+@Singleton
+public class HomePage implements IsElement<HTMLDivElement> {
+
+    @Inject @DataField @IfRole("user")
+    HTMLDivElement userSection;
+
+    @Inject @DataField @IfRole("admin")
+    HTMLDivElement adminPanel;
+
+    @Inject @DataField @IfRole({"user", "admin"})
+    HTMLDivElement superSection;  // requires ALL listed roles
+}
+```
+
+How it works:
+* At compile time, the annotation processor generates a `SecurityContext` role check for each `@IfRole`-annotated `@DataField`
+* The element's `style.display` is set to `"none"` when the user lacks the required roles, and restored to `""` when the user has them
+* A change listener is registered on `SecurityContext` so visibility updates reactively when the user logs in or out — no page reload required
+* Multiple roles use AND semantics (all roles must be present), consistent with `@RolesAllowed`
+
+The `@IfRole` annotation targets fields only:
+
+```java
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface IfRole {
+    String[] value();
+}
+```
+
+**Why `@IfRole` instead of `@RolesAllowed`?** The Jakarta `@RolesAllowed` annotation can only target `TYPE` and `METHOD`, not `FIELD`. `@IfRole` fills this gap for element-level security in templates.
+
+**Note:** `@IfRole` hides elements via CSS (`display: none`). The element remains in the DOM — this is a UI convenience, not a security boundary. Sensitive data should still be protected server-side.
 
 ## 3.5. Data Binding
 
