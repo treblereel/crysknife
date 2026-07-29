@@ -41,6 +41,10 @@
       <artifactId>crysknife-core</artifactId>
     </dependency>
     <dependency>
+      <groupId>io.crysknife.ui</groupId>
+      <artifactId>crysknife-ui-security-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.google.elemental2</groupId>
       <artifactId>elemental2-dom</artifactId>
     </dependency>

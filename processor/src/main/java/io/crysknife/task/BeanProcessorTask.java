@@ -273,8 +273,15 @@ public class BeanProcessorTask implements Task {
         scoped.stream()
             .map(sc -> iocContext.getGenerationContext().getScanResult()
                 .getClassesWithAnnotation(sc))
-            .flatMap(Collection::stream).map(elm -> elements.getTypeElement(elm.getName()))
-            .filter(elm -> elm.getKind().isClass()))
+            .flatMap(Collection::stream).map(elm -> {
+              TypeElement te = elements.getTypeElement(elm.getName());
+              if (te == null) {
+                logger.log(TreeLogger.Type.WARN,
+                    "Cannot resolve TypeElement for classpath class: " + elm.getName());
+              }
+              return te;
+            })
+            .filter(elm -> elm != null && elm.getKind().isClass()))
         .flatMap(Function.identity()).collect(Collectors.toSet());
   }
 

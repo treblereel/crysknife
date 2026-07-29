@@ -21,7 +21,7 @@
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
         <junit.version>4.13.1</junit.version>
-        <jakarta4g.rest.version>0.1</jakarta4g.rest.version>
+        <jakarta4g.rest.version>0.2</jakarta4g.rest.version>
         <mapper.json.version>0.10</mapper.json.version>
     </properties>
 
