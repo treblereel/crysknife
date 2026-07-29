@@ -59,6 +59,10 @@
   - [3.4.4. Page Lifecycle](#344-page-lifecycle)
   - [3.4.5. Following a Manual Link](#345-following-a-manual-link)
   - [3.4.6. Page State (URL Parameters)](#346-page-state-url-parameters)
+  - [3.4.7. Page Security](#347-page-security)
+    - [3.4.7.1. SecurityContext](#3471-securitycontext)
+    - [3.4.7.2. @RolesAllowed and @DenyAll](#3472-rolesallowed-and-denyall)
+    - [3.4.7.3. LoginPage and SecurityError Roles](#3473-loginpage-and-securityerror-roles)
 - [3.5. Data Binding](#35-data-binding)
   - [3.5.1. @Bindable Models](#351-bindable-models)
   - [3.5.2. @Bound Fields](#352-bound-fields)
@@ -1254,6 +1258,100 @@ public void search(String query, List<String> tags) {
     toSearch.go(state);
 }
 ```
+
+### 3.4.7. Page Security
+
+Crysknife integrates Jakarta Security annotations with the navigation system to protect pages based on user roles. Security guards are generated at compile time and check the `SecurityContext` before allowing navigation to a page.
+
+Add the security dependency:
+
+```xml
+<dependency>
+    <groupId>io.crysknife.ui</groupId>
+    <artifactId>crysknife-ui-security-api</artifactId>
+    <version>${crysknife.version}</version>
+</dependency>
+```
+
+#### 3.4.7.1. SecurityContext
+
+`SecurityContext` is an `@ApplicationScoped` bean that holds the current user's identity and roles. Populate it after authentication (e.g., from an OIDC/REST endpoint):
+
+```java
+@Inject
+SecurityContext securityContext;
+
+void onLoginComplete(String username, String[] roles) {
+    securityContext.setUser(new UserImpl(username, roles));
+}
+```
+
+Key methods:
+* `isLoggedIn()` — returns `true` if a non-anonymous user is set
+* `isUserInRole(String role)` — checks if the user has a specific role
+* `isUserInAllRoles(String... roles)` — checks if the user has all specified roles
+* `getUser()` — returns the current `User`
+* `setUser(User user)` — sets the authenticated user
+* `reset()` — clears the user (logout)
+
+#### 3.4.7.2. @RolesAllowed and @DenyAll
+
+Annotate `@Page` classes with Jakarta Security annotations to restrict access:
+
+```java
+@Page(path = "admin")
+@RolesAllowed("admin")
+@Templated
+@Singleton
+public class AdminPage implements IsElement<HTMLDivElement> {
+    // Only accessible to users with the "admin" role
+}
+
+@Page(path = "dashboard")
+@RolesAllowed({"user", "admin"})
+@Templated
+@Singleton
+public class DashboardPage implements IsElement<HTMLDivElement> {
+    // Requires both "user" AND "admin" roles
+}
+
+@Page(path = "disabled")
+@DenyAll
+@Templated
+@Singleton
+public class DisabledPage implements IsElement<HTMLDivElement> {
+    // Always blocked, redirects to SecurityError page
+}
+```
+
+When a user navigates to a protected page:
+1. If not logged in → redirects to the page with `LoginPage` role
+2. If logged in but missing required roles → redirects to the page with `SecurityError` role
+3. `@DenyAll` → always redirects to `SecurityError`, regardless of authentication
+
+Pages without security annotations (or with `@PermitAll`) are accessible to everyone.
+
+#### 3.4.7.3. LoginPage and SecurityError Roles
+
+You must define pages with `LoginPage` and `SecurityError` roles to handle security redirects:
+
+```java
+@Page(role = LoginPage.class)
+@Templated
+@Singleton
+public class MyLoginPage implements IsElement<HTMLDivElement> {
+    // Shown when an unauthenticated user tries to access a protected page
+}
+
+@Page(role = SecurityError.class)
+@Templated
+@Singleton
+public class AccessDeniedPage implements IsElement<HTMLDivElement> {
+    // Shown when a user lacks the required roles
+}
+```
+
+`LoginPage` and `SecurityError` are `UniquePageRole` markers from `io.crysknife.ui.navigation.client`. Each application using security guards must have exactly one page for each role.
 
 ## 3.5. Data Binding
 
