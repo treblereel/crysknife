@@ -18,7 +18,7 @@
         <maven.compiler.target>21</maven.compiler.target>
         <maven.deploy.skip>true</maven.deploy.skip>
 
-        <jakarta4g.rest.version>0.1</jakarta4g.rest.version>
+        <jakarta4g.rest.version>0.2</jakarta4g.rest.version>
         <mapper.json.version>0.10</mapper.json.version>
     </properties>
 

@@ -139,9 +139,11 @@ public class NavigationGraphGenerator {
         compilationUnit.addImport(Event.class);
         compilationUnit.addImport(ApplicationScoped.class);
         compilationUnit.addImport(Specializes.class);
-        compilationUnit.addImport(SecurityContext.class);
-        compilationUnit.addImport(LoginPage.class);
-        compilationUnit.addImport(SecurityError.class);
+        if (hasSecurityAnnotatedPages()) {
+            compilationUnit.addImport(SecurityContext.class);
+            compilationUnit.addImport(LoginPage.class);
+            compilationUnit.addImport(SecurityError.class);
+        }
 
 
         classDeclaration.getExtendedTypes().add(new ClassOrInterfaceType().setName("NavigationGraph"));
@@ -890,5 +892,11 @@ public class NavigationGraphGenerator {
 
     protected boolean isRelevantClass(TypeElement clazz) {
         return null != clazz.getAnnotation(Page.class);
+    }
+
+    private boolean hasSecurityAnnotatedPages() {
+        return pages.stream().anyMatch(page ->
+                page.getAnnotation(DenyAll.class) != null
+                        || page.getAnnotation(RolesAllowed.class) != null);
     }
 }
