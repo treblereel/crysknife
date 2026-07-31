@@ -5,10 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.crysknife.tests</groupId>
-    <artifactId>j2cl-tests</artifactId>
+    <artifactId>j2cl-tests-translation-en</artifactId>
     <version>0.10</version>
-    <name>Crysknife :: Tests :: J2CL</name>
-    <description>J2CL integration tests</description>
+    <name>Crysknife :: Tests :: J2CL :: Translation EN</name>
+    <description>J2CL browser tests for TranslationBundle with default (English) locale</description>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -19,10 +19,9 @@
 
         <maven.compiler.plugin.version>3.15.0</maven.compiler.plugin.version>
         <maven.deploy.plugin.version>3.0.0-M2</maven.deploy.plugin.version>
-        <maven.surefire.plugin.version>3.0.0-M5</maven.surefire.plugin.version>
+        <maven.surefire.plugin.version>3.1.0</maven.surefire.plugin.version>
 
         <crysknife.version>0.10</crysknife.version>
-        <patternfly.version>0.3.0</patternfly.version>
         <j2cl.platform.version>20260527-1</j2cl.platform.version>
         <org.treblereel.j2cl.processors.version>0.10</org.treblereel.j2cl.processors.version>
     </properties>
@@ -58,24 +57,32 @@
             <version>${crysknife.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.patternfly</groupId>
-            <artifactId>patternfly-java-components</artifactId>
-            <version>${patternfly.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.patternfly</groupId>
-            <artifactId>patternfly-java-j2cl</artifactId>
-            <version>${patternfly.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.patternfly</groupId>
-            <artifactId>patternfly-java-icons</artifactId>
-            <version>${patternfly.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.treblereel.j2cl.processors</groupId>
             <artifactId>annotations</artifactId>
             <version>${org.treblereel.j2cl.processors.version}</version>
+        </dependency>
+
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>org.kie.j2cl.tools</groupId>
+            <artifactId>junit-annotations</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.j2cl.tools</groupId>
+            <artifactId>gwttestcase-emul</artifactId>
+            <classifier>sources</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.j2cl.tools</groupId>
+            <artifactId>junit-emul</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -86,7 +93,6 @@
                 <includes>
                     <include>**/*.html</include>
                     <include>**/*.css</include>
-                    <include>**/*.less</include>
                     <include>**/*.properties</include>
                 </includes>
             </resource>
@@ -153,17 +159,17 @@
                 <version>0.23.8</version>
                 <executions>
                     <execution>
-                        <id>build-js</id>
-                        <phase>process-classes</phase>
+                        <id>j2cl-test</id>
+                        <phase>test</phase>
                         <goals>
-                            <goal>build</goal>
+                            <goal>test</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
-                    <webappDirectory>${project.build.directory}/gwt/launcherDir/${project.artifactId}/</webappDirectory>
                     <compilationLevel>ADVANCED</compilationLevel>
                     <annotationProcessorMode>IGNORE_MAVEN</annotationProcessorMode>
+                    <webdriver>chrome</webdriver>
                 </configuration>
             </plugin>
         </plugins>

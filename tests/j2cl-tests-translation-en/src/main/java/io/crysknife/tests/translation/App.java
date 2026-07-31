@@ -12,22 +12,31 @@
  * the License.
  */
 
-package io.crysknife.ui.translation.client.annotation;
+package io.crysknife.tests.translation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import jakarta.annotation.PostConstruct;
+import jakarta.inject.Inject;
 
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface TranslationKey {
+import elemental2.dom.DomGlobal;
+import io.crysknife.annotation.Application;
+import org.treblereel.j2cl.processors.annotations.GWT3EntryPoint;
 
-  String defaultValue();
+@Application
+public class App {
 
-  String key() default "<auto>";
+  @Inject
+  TestMessages messages;
 
-  boolean html() default false;
+  @Inject
+  TranslatedComponent translatedComponent;
 
-  boolean unescapeHtmlEntities() default false;
+  @GWT3EntryPoint
+  public void onModuleLoad() {
+    new AppBootstrap(this).initialize();
+  }
+
+  @PostConstruct
+  public void init() {
+    DomGlobal.document.body.appendChild(translatedComponent.getElement());
+  }
 }

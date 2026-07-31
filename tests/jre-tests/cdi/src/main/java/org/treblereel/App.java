@@ -14,7 +14,6 @@
 
 package org.treblereel;
 
-import io.crysknife.ui.translation.client.annotation.Bundle;
 import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 
@@ -56,12 +55,12 @@ import org.treblereel.injection.singleton.SimpleSingletonTest;
 import org.treblereel.postconstruct.PostConstructs;
 import org.treblereel.produces.SimpleBeanProducerTest;
 import org.treblereel.produces.qualifier.QualifierBeanProducerHolder;
+import org.treblereel.ui.translation.AppMessagesBeanHolder;
 
 /**
  * @author Dmitrii Tikhomirov Created by treblereel 3/21/20
  */
 @Application
-@Bundle("i18n/simple/i18n.properties")
 public class App {
 
   public String testPostConstruct;
@@ -165,6 +164,9 @@ public class App {
 
   @Inject
   public DataBinder<UserModel> userBinder;
+
+  @Inject
+  public AppMessagesBeanHolder appMessagesBeanHolder;
 
   public void onModuleLoad() {
     new AppBootstrap(this).initialize();

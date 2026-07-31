@@ -12,22 +12,20 @@
  * the License.
  */
 
-package io.crysknife.ui.translation.client.annotation;
+package org.treblereel.ui.translation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import io.crysknife.ui.translation.client.annotation.TranslationBundle;
+import io.crysknife.ui.translation.client.annotation.TranslationKey;
 
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface TranslationKey {
+@TranslationBundle
+public interface AppMessages {
 
-  String defaultValue();
+  @TranslationKey(defaultValue = "Welcome")
+  String welcome();
 
-  String key() default "<auto>";
+  @TranslationKey(defaultValue = "Save")
+  String save();
 
-  boolean html() default false;
-
-  boolean unescapeHtmlEntities() default false;
+  @TranslationKey(defaultValue = "Hello {$name}, you have {$count} messages")
+  String greeting(String name, String count);
 }

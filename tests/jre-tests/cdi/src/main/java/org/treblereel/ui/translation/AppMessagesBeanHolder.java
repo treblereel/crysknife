@@ -12,22 +12,14 @@
  * the License.
  */
 
-package io.crysknife.ui.translation.client.annotation;
+package org.treblereel.ui.translation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface TranslationKey {
+@ApplicationScoped
+public class AppMessagesBeanHolder {
 
-  String defaultValue();
-
-  String key() default "<auto>";
-
-  boolean html() default false;
-
-  boolean unescapeHtmlEntities() default false;
+  @Inject
+  public AppMessages messages;
 }

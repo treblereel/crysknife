@@ -68,12 +68,20 @@
       <artifactId>utils</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.google.javascript</groupId>
+      <artifactId>closure-compiler</artifactId>
+    </dependency>
+    <dependency>
       <groupId>io.crysknife.ui</groupId>
       <artifactId>crysknife-ui-core</artifactId>
     </dependency>
     <dependency>
       <groupId>io.crysknife.ui</groupId>
       <artifactId>crysknife-ui-security-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
     </dependency>
   </dependencies>
   <build>
