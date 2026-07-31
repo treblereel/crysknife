@@ -14,8 +14,10 @@
 
 package io.crysknife.ui.templates.generator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -45,7 +47,7 @@ import io.crysknife.ui.templates.client.TemplateUtil;
 import io.crysknife.ui.templates.client.annotation.Templated;
 import io.crysknife.ui.templates.generator.dto.TemplateDefinition;
 import io.crysknife.ui.templates.generator.events.EventHandlerTemplatedProcessor;
-import io.crysknife.ui.templates.generator.translation.TranslationServiceGenerator;
+import io.crysknife.ui.translation.client.annotation.TranslationBundle;
 import jsinterop.base.Js;
 import org.jboss.gwt.elemento.processor.TemplateSelector;
 import org.jboss.gwt.elemento.processor.TypeSimplifier;
@@ -67,7 +69,6 @@ public class TemplateGenerator extends IOCGenerator<BeanDefinition> {
     private final DataFieldProcessor dataFieldProcessor;
     private final StylesheetProcessor stylesheetProcessor;
     private final EventHandlerTemplatedProcessor eventHandlerTemplatedProcessor;
-    private final TranslationServiceGenerator translationServiceGenerator;
 
     private final FreemarkerTemplateGenerator freemarkerTemplateGenerator =
             new FreemarkerTemplateGenerator("ui.ftlh");
@@ -84,7 +85,6 @@ public class TemplateGenerator extends IOCGenerator<BeanDefinition> {
         this.dataFieldProcessor = new DataFieldProcessor(iocContext, treeLogger);
         this.stylesheetProcessor = new StylesheetProcessor(iocContext, templatedGeneratorUtils);
         this.eventHandlerTemplatedProcessor = new EventHandlerTemplatedProcessor(iocContext);
-        this.translationServiceGenerator = new TranslationServiceGenerator(iocContext);
         this.isElement = iocContext.getGenerationContext().getProcessingEnvironment().getElementUtils()
                 .getTypeElement(IsElement.class.getCanonicalName());
     }
@@ -160,9 +160,8 @@ public class TemplateGenerator extends IOCGenerator<BeanDefinition> {
 
         context.setStylesheet(stylesheetProcessor.resolveStylesheet(type, templated));
 
-        code(classMetaInfo, beanDefinition, context, templateDefinition);
+        code(classMetaInfo, beanDefinition, context, templateDefinition, root);
 
-        translationServiceGenerator.process(classMetaInfo, context);
         String source = freemarkerTemplateGenerator.toSource(templateDefinition);
         classMetaInfo.addToBody(() -> source);
         logger.log(TreeLogger.Type.INFO, "Generated templated implementation [" + context.getSubclass()
@@ -170,7 +169,8 @@ public class TemplateGenerator extends IOCGenerator<BeanDefinition> {
     }
 
     private void code(ClassMetaInfo builder, BeanDefinition beanDefinition,
-                      TemplateContext templateContext, TemplateDefinition templateDefinition) {
+                      TemplateContext templateContext, TemplateDefinition templateDefinition,
+                      org.jsoup.nodes.Element root) {
         addImports(builder);
         stylesheetProcessor.processStylesheet(builder, templateContext, templateDefinition);
 
@@ -180,6 +180,7 @@ public class TemplateGenerator extends IOCGenerator<BeanDefinition> {
         dataFieldGenerator.generateCode(templateContext, templateDefinition);
         eventHandlerTemplatedProcessor.generateEventCode(beanDefinition, templateContext,
                 templateDefinition);
+        processI18nKeys(builder, root);
         processOnDestroy(builder);
     }
 
@@ -207,6 +208,87 @@ public class TemplateGenerator extends IOCGenerator<BeanDefinition> {
                 .map(attr -> new io.crysknife.ui.templates.generator.dto.Attribute(attr.getKey(),
                         attr.getValue().replaceAll("\\s+", " ").trim()))
                 .forEach(a -> templateDefinition.getAttributes().add(a));
+    }
+
+    private void processI18nKeys(ClassMetaInfo classMetaInfo, org.jsoup.nodes.Element root) {
+        org.jsoup.select.Elements i18nElements = root.select("[data-i18n-key]");
+        if (i18nElements.isEmpty()) {
+            return;
+        }
+
+        Set<TypeElement> bundleTypes =
+                iocContext.getTypeElementsByAnnotation(TranslationBundle.class
+                                .getCanonicalName());
+        List<String> bundleClasses = new ArrayList<>();
+        for (TypeElement te : bundleTypes) {
+            bundleClasses.add(te.getQualifiedName().toString());
+        }
+
+        for (org.jsoup.nodes.Element element : i18nElements) {
+            String key = element.attr("data-i18n-key");
+            int dotIndex = key.indexOf('.');
+            if (dotIndex <= 0 || dotIndex == key.length() - 1) {
+                throw new GenerationException(
+                        "Invalid data-i18n-key format: '" + key
+                                + "'. Expected 'BundleName.methodName'");
+            }
+            String bundleSimpleName = key.substring(0, dotIndex);
+            String methodName = key.substring(dotIndex + 1);
+
+            // Find the bundle class
+            String bundleQualified = null;
+            for (String candidate : bundleClasses) {
+                if (candidate.endsWith("." + bundleSimpleName)
+                        || candidate.equals(bundleSimpleName)) {
+                    bundleQualified = candidate;
+                    break;
+                }
+            }
+            if (bundleQualified == null) {
+                throw new GenerationException(
+                        "Unknown TranslationBundle: " + bundleSimpleName
+                                + " referenced in data-i18n-key='" + key + "'");
+            }
+
+            // Verify method exists and has no parameters
+            TypeElement bundleType = iocContext.getGenerationContext().getElements()
+                    .getTypeElement(bundleQualified);
+            boolean methodFound = false;
+            for (javax.lang.model.element.Element enclosed : bundleType.getEnclosedElements()) {
+                if (enclosed.getKind() == javax.lang.model.element.ElementKind.METHOD
+                        && enclosed.getSimpleName().toString().equals(methodName)) {
+                    ExecutableElement execMethod = (ExecutableElement) enclosed;
+                    if (!execMethod.getParameters().isEmpty()) {
+                        throw new GenerationException(
+                                "data-i18n-key cannot reference method '" + methodName
+                                        + "' with parameters; use @Inject instead");
+                    }
+                    methodFound = true;
+                    break;
+                }
+            }
+            if (!methodFound) {
+                throw new GenerationException(
+                        "No method '" + methodName + "' on TranslationBundle " + bundleSimpleName);
+            }
+
+            // Generate: element.textContent = new BundleImpl().method();
+            String dataFieldId = element.attr("data-field");
+            if (dataFieldId == null || dataFieldId.isEmpty()) {
+                dataFieldId = element.attr("id");
+            }
+            if (dataFieldId == null || dataFieldId.isEmpty()) {
+                throw new GenerationException(
+                        "Element with data-i18n-key='" + key
+                                + "' must have either data-field or id attribute");
+            }
+            String implQualified = bundleQualified + "Impl";
+            String stmt =
+                    "((elemental2.dom.HTMLElement) TemplateUtil.resolveElement(instance.getElement(), \""
+                            + dataFieldId + "\")).textContent = new " + implQualified + "()."
+                            + methodName + "();";
+            classMetaInfo.addToDoInitInstance(() -> stmt);
+        }
     }
 
     private void processOnDestroy(ClassMetaInfo builder) {

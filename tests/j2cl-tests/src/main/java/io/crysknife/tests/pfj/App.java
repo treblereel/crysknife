@@ -119,7 +119,8 @@ public class App {
                     .addItem(navigationItem("toolbar", "Toolbar", "#ToolbarDemo"))
                     .addItem(navigationItem("tooltip", "Tooltip", "#TooltipDemo"))
                     .addItem(navigationItem("tree-view", "Tree view", "#TreeViewDemo"))
-                    .addItem(navigationItem("truncate", "Truncate", "#TruncateDemo")))))
+                    .addItem(navigationItem("truncate", "Truncate", "#TruncateDemo"))
+                    .addItem(navigationItem("translation", "Translation", "#TranslationDemo")))))
         .addMain(main));
   }
 }

@@ -12,22 +12,26 @@
  * the License.
  */
 
-package io.crysknife.ui.translation.client.annotation;
+package io.crysknife.tests.translation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import jakarta.inject.Singleton;
 
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface TranslationKey {
+import elemental2.dom.HTMLDivElement;
+import elemental2.dom.HTMLElement;
+import io.crysknife.client.IsElement;
+import io.crysknife.ui.templates.client.annotation.DataField;
+import io.crysknife.ui.templates.client.annotation.Templated;
 
-  String defaultValue();
+@Singleton
+@Templated("TranslatedComponent.html")
+public class TranslatedComponent implements IsElement<HTMLDivElement> {
 
-  String key() default "<auto>";
+  @DataField
+  HTMLElement welcomeLabel;
 
-  boolean html() default false;
+  @DataField
+  HTMLElement saveLabel;
 
-  boolean unescapeHtmlEntities() default false;
+  @DataField
+  HTMLElement deleteLabel;
 }

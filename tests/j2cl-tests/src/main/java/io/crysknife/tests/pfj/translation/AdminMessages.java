@@ -12,22 +12,20 @@
  * the License.
  */
 
-package io.crysknife.ui.translation.client.annotation;
+package io.crysknife.tests.pfj.translation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import io.crysknife.ui.translation.client.annotation.TranslationBundle;
+import io.crysknife.ui.translation.client.annotation.TranslationKey;
 
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface TranslationKey {
+@TranslationBundle("AdminLabels")
+public interface AdminMessages {
 
-  String defaultValue();
+  @TranslationKey(defaultValue = "Dashboard")
+  String dashboard();
 
-  String key() default "<auto>";
+  @TranslationKey(defaultValue = "Settings")
+  String settings();
 
-  boolean html() default false;
-
-  boolean unescapeHtmlEntities() default false;
+  @TranslationKey(defaultValue = "Users online: {$count}")
+  String usersOnline(String count);
 }
