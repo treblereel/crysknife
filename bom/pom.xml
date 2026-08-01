@@ -116,6 +116,18 @@
 
             <dependency>
                 <groupId>io.crysknife.ui</groupId>
+                <artifactId>crysknife-ui-websocket-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.crysknife.ui</groupId>
+                <artifactId>crysknife-ui-websocket-generator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.crysknife.ui</groupId>
                 <artifactId>crysknife-ui-security-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
