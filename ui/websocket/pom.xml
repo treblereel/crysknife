@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>io.crysknife</groupId>
-    <artifactId>crysknife-parent</artifactId>
+    <groupId>io.crysknife.ui</groupId>
+    <artifactId>parent</artifactId>
     <version>0.10</version>
   </parent>
 
-  <groupId>io.crysknife.ui</groupId>
-  <artifactId>parent</artifactId>
-  <name>Crysknife :: UI</name>
-  <description>UI modules parent</description>
+  <artifactId>crysknife-ui-websocket-parent</artifactId>
+  <name>Crysknife :: UI :: WebSocket</name>
+  <description>Jakarta WebSocket client integration for crysknife DI</description>
   <packaging>pom</packaging>
 
   <developers>
@@ -21,15 +22,6 @@
       <email>chani.liet@gmail.com</email>
     </developer>
   </developers>
-
-  <modules>
-    <module>core</module>
-    <module>generator</module>
-    <module>databinding</module>
-    <module>rest</module>
-    <module>security</module>
-    <module>websocket</module>
-  </modules>
 
   <licenses>
     <license>
@@ -44,4 +36,8 @@
     <url>https://github.com/treblereel</url>
   </organization>
 
+  <modules>
+    <module>api</module>
+    <module>generator</module>
+  </modules>
 </project>

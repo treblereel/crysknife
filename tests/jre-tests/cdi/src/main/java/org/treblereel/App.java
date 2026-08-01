@@ -56,6 +56,7 @@ import org.treblereel.postconstruct.PostConstructs;
 import org.treblereel.produces.SimpleBeanProducerTest;
 import org.treblereel.produces.qualifier.QualifierBeanProducerHolder;
 import org.treblereel.ui.translation.AppMessagesBeanHolder;
+import org.treblereel.websocket.EchoEndpointHolder;
 
 /**
  * @author Dmitrii Tikhomirov Created by treblereel 3/21/20
@@ -167,6 +168,9 @@ public class App {
 
   @Inject
   public AppMessagesBeanHolder appMessagesBeanHolder;
+
+  @Inject
+  public EchoEndpointHolder echoEndpointHolder;
 
   public void onModuleLoad() {
     new AppBootstrap(this).initialize();

@@ -79,6 +79,14 @@
   - [3.6.3. Configuring the REST Endpoint](#363-configuring-the-rest-endpoint)
   - [3.6.4. Injecting and Using the Caller](#364-injecting-and-using-the-caller)
   - [3.6.5. Using Qualifiers for Multiple Endpoints](#365-using-qualifiers-for-multiple-endpoints)
+- [3.8. WebSocket Client](#38-websocket-client)
+  - [3.8.1. Dependencies](#381-dependencies)
+  - [3.8.2. Defining a Client Endpoint](#382-defining-a-client-endpoint)
+  - [3.8.3. Connecting](#383-connecting)
+  - [3.8.4. Sending Messages via Session](#384-sending-messages-via-session)
+  - [3.8.5. Dual @OnMessage — Text and Binary](#385-dual-onmessage--text-and-binary)
+  - [3.8.6. Lifecycle Callbacks](#386-lifecycle-callbacks)
+  - [3.8.7. Limitations](#387-limitations)
 - [4. Contributing to Crysknife](#4-contributing-to-crysknife)
 - [5. Crysknife License](#5-crysknife-license)
 
@@ -1945,6 +1953,185 @@ public RestConfig externalApiConfig() {
 @ExternalApi
 Caller<PostService> externalPostCaller;
 ```
+
+## 3.8. WebSocket Client
+
+Crysknife provides a CDI-managed WebSocket client built on top of Jakarta WebSocket annotations. You define a `@ClientEndpoint` bean with `@OnOpen`, `@OnMessage`, `@OnClose`, and `@OnError` lifecycle methods, and Crysknife generates the WebSocket proxy at compile time. Connection is managed via a type-safe `WebSocketConnector<T>` injectable.
+
+### 3.8.1. Dependencies
+
+Add the following dependencies to your `pom.xml`:
+
+```xml
+<!-- WebSocket CDI API (WebSocketConnector) -->
+<dependency>
+    <groupId>io.crysknife.ui</groupId>
+    <artifactId>crysknife-ui-websocket-api</artifactId>
+    <version>${crysknife.version}</version>
+</dependency>
+
+<!-- Jakarta WebSocket client runtime (J2CL-compatible) -->
+<dependency>
+    <groupId>org.treblereel.gwt.jakarta.websocket</groupId>
+    <artifactId>common</artifactId>
+    <version>0.1</version>
+</dependency>
+
+<!-- WebSocket code generator (compile-time only) -->
+<dependency>
+    <groupId>io.crysknife.ui</groupId>
+    <artifactId>crysknife-ui-websocket-generator</artifactId>
+    <version>${crysknife.version}</version>
+    <scope>provided</scope>
+</dependency>
+```
+
+### 3.8.2. Defining a Client Endpoint
+
+Annotate a CDI bean with `@ClientEndpoint` and add lifecycle methods:
+
+```java
+@ClientEndpoint
+@Singleton
+public class ChatEndpoint {
+
+    @Inject
+    NotificationService notifications;
+
+    @OnOpen
+    public void onOpen(Session session) {
+        notifications.show("Connected");
+    }
+
+    @OnMessage
+    public void onMessage(String message) {
+        notifications.show(message);
+    }
+
+    @OnClose
+    public void onClose(CloseReason reason) {
+        notifications.show("Disconnected: " + reason.getReasonPhrase());
+    }
+
+    @OnError
+    public void onError(Throwable error) {
+        notifications.show("Error: " + error.getMessage());
+    }
+}
+```
+
+The endpoint is a regular CDI bean — you can use `@Inject`, `@PostConstruct`, and any scope (`@Singleton`, `@Dependent`, `@ApplicationScoped`).
+
+### 3.8.3. Connecting
+
+Inject `WebSocketConnector<T>` where `T` is your `@ClientEndpoint` bean. Call `baseUri()` to set the WebSocket URL and `connect()` to initiate the connection:
+
+```java
+@ApplicationScoped
+public class ChatPanel {
+
+    @Inject
+    WebSocketConnector<ChatEndpoint> connector;
+
+    public void connect() {
+        connector.baseUri("ws://localhost:8080/chat").connect();
+    }
+}
+```
+
+`connect()` is fire-and-forget — it initiates the connection asynchronously. The `jakarta.websocket.Session` is delivered to your `@OnOpen` method, not returned from `connect()`. This matches the browser's async WebSocket model.
+
+### 3.8.4. Sending Messages via Session
+
+Use the `Session` received in `@OnOpen` to send messages:
+
+```java
+@ClientEndpoint
+@Singleton
+public class ChatEndpoint {
+
+    private Session session;
+
+    @OnOpen
+    public void onOpen(Session session) {
+        this.session = session;
+        session.getBasicRemote().sendText("hello from client");
+    }
+
+    public void send(String message) {
+        if (session != null) {
+            session.getBasicRemote().sendText(message);
+        }
+    }
+}
+```
+
+### 3.8.5. Dual @OnMessage — Text and Binary
+
+An endpoint can have two `@OnMessage` methods — one for text (`String`) and one for binary (`byte[]`):
+
+```java
+@ClientEndpoint
+@Singleton
+public class DataEndpoint {
+
+    @OnMessage
+    public void onText(String message, Session session) {
+        // handle text message
+    }
+
+    @OnMessage
+    public void onBinary(byte[] data, Session session) {
+        // handle binary message
+    }
+}
+```
+
+The generator classifies each method by parameter type and overrides `handleTextMessage` and `handleBinaryMessage` independently.
+
+### 3.8.6. Lifecycle Callbacks
+
+All callback parameters are optional and order-independent. The generator matches by type:
+
+| Annotation | Recognized parameter types |
+|------------|--------------------------|
+| `@OnOpen` | `Session` |
+| `@OnMessage` | `String` or `byte[]`, `Session` |
+| `@OnClose` | `CloseReason`, `Session` |
+| `@OnError` | `Throwable` (or subclasses), `Session` |
+
+Examples:
+
+```java
+@OnOpen
+public void onOpen() { }                      // no parameters — valid
+
+@OnOpen
+public void onOpen(Session session) { }        // Session only — valid
+
+@OnMessage
+public void onMessage(String msg) { }          // payload only — valid
+
+@OnMessage
+public void onMessage(String msg, Session s) { } // payload + session — valid
+
+@OnClose
+public void onClose(CloseReason reason) { }    // reason only — valid
+
+@OnError
+public void onError(Throwable error) { }       // error only — valid
+```
+
+### 3.8.7. Limitations
+
+* `connect()` returns `void` — session is delivered asynchronously via `@OnOpen`
+* No automatic reconnection (must be implemented manually)
+* No Encoder/Decoder framework support
+* No `@PathParam` URI template variables
+* No partial message handling
+* No Ping/Pong (browser WebSocket API limitation)
+* At most one text `@OnMessage` and one binary `@OnMessage` per endpoint
+* `@ClientEndpoint` subprotocols attribute is not processed (use `WebSocketConnector.subprotocol()` instead)
 
 # 4. Contributing to Crysknife
 

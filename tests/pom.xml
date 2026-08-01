@@ -24,5 +24,6 @@
     <module>j2cl-tests-rest</module>
     <module>j2cl-tests-navigation</module>
     <module>j2cl-tests-templates</module>
+    <module>j2cl-tests-websocket</module>
   </modules>
 </project>
