@@ -1396,11 +1396,127 @@ public @interface IfRole {
 
 **Note:** `@IfRole` hides elements via CSS (`display: none`). The element remains in the DOM — this is a UI convenience, not a security boundary. Sensitive data should still be protected server-side.
 
-## 3.5. Data Binding
+## 3.5. Internationalization (i18n)
+
+Crysknife provides compile-time internationalization using Closure Compiler's `goog.getMsg()` and XTB translation files. Translations are resolved at compile time — no runtime lookups or Map-based dictionaries. Each locale produces a separate JS bundle with all strings baked in.
+
+### 3.5.1. Defining a Translation Bundle
+
+Create a Java interface annotated with `@TranslationBundle`. Each method represents a translatable message, annotated with `@TranslationKey`:
+
+```java
+@TranslationBundle
+public interface AppMessages {
+
+  @TranslationKey(defaultValue = "Welcome")
+  String welcome();
+
+  @TranslationKey(defaultValue = "Save")
+  String save();
+
+  @TranslationKey(defaultValue = "Hello {$name}, you have {$count} messages")
+  String greeting(String name, String count);
+
+  @TranslationKey(defaultValue = "Delete", key = "btn_delete")
+  String deleteButton();
+}
+```
+
+- `defaultValue` — the default (English) text returned when no locale is active
+- `key` — optional custom message key (defaults to `BundleName.methodName`)
+- Parameterized messages use `{$paramName}` placeholders matching method parameter names
+
+### 3.5.2. Providing Translations
+
+Place a `.properties` file alongside the interface with the locale suffix:
+
+```
+# AppMessages_ru.properties
+welcome=Добро пожаловать
+save=Сохранить
+greeting=Привет {$name}, у тебя {$count} сообщений
+btn_delete=Удалить
+```
+
+The annotation processor generates:
+- `AppMessagesImpl.java` — a Java stub implementing the interface
+- `AppMessagesImpl.native.js` — JavaScript with `goog.getMsg()` calls
+- `gwt3_message_bundle_ru.xtb` — XTB file for Closure Compiler
+
+### 3.5.3. Injecting a Bundle
+
+Inject the bundle interface via CDI:
+
+```java
+@Inject
+AppMessages messages;
+```
+
+Call methods to get translated strings:
+
+```java
+String text = messages.welcome(); // "Welcome" or "Добро пожаловать"
+String greeting = messages.greeting("World", "5");
+```
+
+### 3.5.4. Template Translation with data-i18n-key
+
+In `@Templated` HTML, use the `data-i18n-key` attribute to translate element text content at initialization. The element must also have a `data-field` or `id` attribute:
+
+```html
+<div>
+    <span data-field="welcomeLabel" data-i18n-key="AppMessages.welcome">placeholder</span>
+    <span data-field="saveBtn" data-i18n-key="AppMessages.save">placeholder</span>
+    <span data-field="deleteBtn" data-i18n-key="AppMessages.deleteButton">placeholder</span>
+</div>
+```
+
+The format is `BundleName.methodName`. At component initialization, the generated code sets each element's `textContent` to the translated value. Only zero-parameter methods are supported in `data-i18n-key`.
+
+The corresponding component only needs `@DataField` declarations:
+
+```java
+@Singleton
+@Templated("MyComponent.html")
+public class MyComponent implements IsElement<HTMLDivElement> {
+
+  @DataField
+  HTMLElement welcomeLabel;
+
+  @DataField
+  HTMLElement saveBtn;
+
+  @DataField
+  HTMLElement deleteBtn;
+}
+```
+
+### 3.5.5. Building with a Locale
+
+Each J2CL build targets one locale. Configure the locale and XTB auto-discovery in the j2cl-maven-plugin:
+
+```xml
+<plugin>
+    <groupId>org.kie.j2cl.tools</groupId>
+    <artifactId>j2cl-maven-plugin</artifactId>
+    <configuration>
+        <defines>
+            <goog.LOCALE>ru</goog.LOCALE>
+        </defines>
+        <translationsFile>
+            <auto>true</auto>
+        </translationsFile>
+    </configuration>
+</plugin>
+```
+
+Without `goog.LOCALE`, `goog.getMsg()` returns the `defaultValue` strings (English). With a locale and matching XTB file, Closure Compiler substitutes the translated text at compile time.
+
+## 3.6. Data Binding
 
 Crysknife provides a two-way data binding system that automatically synchronizes model properties with UI elements. When a user types into a bound input field, the model updates automatically. When the model changes programmatically, the UI reflects the new values. Inspired by Errai Data Binding.
 
-### 3.5.1. @Bindable Models
+### 3.6.1. @Bindable Models
 
 To make a model class eligible for data binding, annotate it with `@Bindable`. The annotation processor generates a proxy subclass that intercepts setter calls and fires property change events.
 
@@ -1438,7 +1554,7 @@ Requirements for `@Bindable` classes:
 * Setters must not be `final` or `private`
 * Properties follow JavaBean convention (getter/setter pairs)
 
-### 3.5.2. @Bound Fields
+### 3.6.2. @Bound Fields
 
 Use the `@Bound` annotation on `@DataField` elements in a `@Templated` bean to bind them to model properties. The `DataBinder` is injected and manages the binding lifecycle.
 
@@ -1482,7 +1598,7 @@ public class ContactForm implements IsElement<HTMLDivElement> {
 
 When `property` is not specified in `@Bound`, the field name is used as the property name.
 
-### 3.5.3. Nested Bean Properties (Dot-Notation)
+### 3.6.3. Nested Bean Properties (Dot-Notation)
 
 Bind to properties of nested beans using dot-notation. The nested bean must also be annotated with `@Bindable`:
 
@@ -1510,7 +1626,7 @@ HTMLInputElement zipInput;
 
 Changes to `cityInput` will call `getModel().getAddress().setCity(...)` automatically, and calling `getModel().getAddress().setCity("Boston")` will update `cityInput`.
 
-### 3.5.4. Programmatic Binding with DataBinder
+### 3.6.4. Programmatic Binding with DataBinder
 
 In addition to declarative `@Bound` annotations, you can bind elements programmatically:
 
@@ -1543,7 +1659,7 @@ binder.unbind("propertyName");
 binder.unbind();  // unbind all
 ```
 
-### 3.5.5. Property Change Handlers
+### 3.6.5. Property Change Handlers
 
 Listen for property changes on the model. Handlers fire whenever a bound property changes, whether from user input or programmatic updates:
 
@@ -1564,7 +1680,7 @@ PropertyChangeUnsubscribeHandle handle =
 handle.unsubscribe();
 ```
 
-### 3.5.6. Collection Binding with ListComponent
+### 3.6.6. Collection Binding with ListComponent
 
 `ListComponent<M>` automatically renders list items as child DOM elements. When bound to an `ObservableList` property, it re-renders whenever items are added or removed.
 
@@ -1598,7 +1714,7 @@ binder.getModel().getTags().add("new-tag");
 binder.getModel().getTags().remove(0);
 ```
 
-### 3.5.7. Converters
+### 3.6.7. Converters
 
 Use a `Converter` to transform values between the model and the UI widget. For example, converting between an integer model property and the string value of an input element:
 
@@ -1631,7 +1747,7 @@ Or programmatically:
 binder.bind(ageInput, "age", new IntegerConverter());
 ```
 
-### 3.5.8. Limitations
+### 3.6.8. Limitations
 
 * `@Bindable` classes must not be `final`
 * Setters must not be `final` or `private`
@@ -1639,11 +1755,11 @@ binder.bind(ageInput, "age", new IntegerConverter());
 * `ListComponent` re-renders the full list on each mutation (no fine-grained DOM diffing)
 * Circular references in `@Bindable` models are not supported
 
-## 3.6. REST Client
+## 3.7. REST Client
 
 Crysknife provides a type-safe REST client built on top of jakarta4g-rest. You define a JAX-RS service interface, and Crysknife generates a `Caller<T>` implementation at compile time. The `Caller` uses `XMLHttpRequest` under the hood and integrates with JSON Mapper for automatic serialization/deserialization.
 
-### 3.6.1. Dependencies
+### 3.7.1. Dependencies
 
 Add the following dependencies to your `pom.xml`:
 
@@ -1701,7 +1817,7 @@ Add the following dependencies to your `pom.xml`:
 </dependency>
 ```
 
-### 3.6.2. Defining a JAX-RS Service Interface
+### 3.7.2. Defining a JAX-RS Service Interface
 
 Define a standard JAX-RS interface. The annotation processor generates a `_RestCaller` implementation and a JSON mapper for each model class used in the interface.
 
@@ -1722,7 +1838,7 @@ public interface PostService {
 
 Supported JAX-RS annotations: `@Path`, `@GET`, `@POST`, `@PUT`, `@DELETE`, `@PathParam`, `@QueryParam`, `@Produces`, `@Consumes`.
 
-### 3.6.3. Configuring the REST Endpoint
+### 3.7.3. Configuring the REST Endpoint
 
 Use a CDI `@Produces` method to provide a `RestConfig` bean that specifies the base URL for your REST service:
 
@@ -1742,7 +1858,7 @@ public class MyRestConfig {
 
 If no `@Named` qualifier is specified and no custom `RestConfig` producer exists, the default `RestConfig` uses the current domain as the base URL (suitable for same-origin APIs).
 
-### 3.6.4. Injecting and Using the Caller
+### 3.7.4. Injecting and Using the Caller
 
 Inject `Caller<T>` where `T` is your JAX-RS service interface. Use the `@Named` qualifier to match the `RestConfig` producer:
 
@@ -1769,7 +1885,7 @@ The `Caller` API is fluent:
 * `.call(callback)` — register a success callback and return the service proxy
 * Then call any method on the service proxy — this triggers the actual HTTP request
 
-### 3.6.5. Using Qualifiers for Multiple Endpoints
+### 3.7.5. Using Qualifiers for Multiple Endpoints
 
 You can define multiple `RestConfig` producers with different qualifiers to talk to different APIs:
 
