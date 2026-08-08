@@ -274,10 +274,10 @@
                     <rules>
                         <banDuplicatePomDependencyVersions/>
                         <requireMavenVersion>
-                            <version>3.0</version>
+                            <version>3.9.0</version>
                         </requireMavenVersion>
                         <requireJavaVersion>
-                            <version>(11.0,)</version>
+                            <version>[21,)</version>
                         </requireJavaVersion>
                     </rules>
                 </configuration>
