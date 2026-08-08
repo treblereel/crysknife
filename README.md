@@ -103,8 +103,8 @@ The goal of this project is to create an Red Hat Errai-like framework for J2CL. 
 
 Crysknife requires the following software in order to run:
 
-* Java 11 or later
-* Maven 3.6.3 or later
+* Java 21 or later
+* Maven 3.9.0 or later
 * Basic knowledge of J2Cl and Maven
 * j2cl-maven-plugin 0.22 or later
 
