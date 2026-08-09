@@ -49,6 +49,9 @@ public class ObservesGenerator extends IOCGenerator<MethodDefinition> {
     private final FreemarkerTemplateGenerator freemarkerTemplateSubscribeGenerator =
             new FreemarkerTemplateGenerator("observes/subscribe.ftlh");
 
+    private final FreemarkerTemplateGenerator freemarkerTemplateConstructorSubscribeGenerator =
+            new FreemarkerTemplateGenerator("observes/constructorSubscribe.ftlh");
+
     private final FreemarkerTemplateGenerator freemarkerTemplateConsumereGenerator =
             new FreemarkerTemplateGenerator("observes/consumer.ftlh");
 
@@ -144,5 +147,9 @@ public class ObservesGenerator extends IOCGenerator<MethodDefinition> {
 
         String source = freemarkerTemplateSubscribeGenerator.toSource(root);
         classMetaInfo.addToDoInitInstance(() -> source);
+        if (!isDependent) {
+            String constructorSource = freemarkerTemplateConstructorSubscribeGenerator.toSource(root);
+            classMetaInfo.addToFactoryConstructor(() -> constructorSource);
+        }
     }
 }
