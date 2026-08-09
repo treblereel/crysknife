@@ -1772,19 +1772,11 @@ Crysknife provides a type-safe REST client built on top of jakarta4g-rest. You d
 Add the following dependencies to your `pom.xml`:
 
 ```xml
-<!-- REST client runtime -->
+<!-- REST client runtime (transitively includes jakarta4g-rest API and JSON Mapper) -->
 <dependency>
     <groupId>io.crysknife.ui</groupId>
     <artifactId>crysknife-ui-rest-api</artifactId>
     <version>${crysknife.version}</version>
-</dependency>
-
-<!-- REST client code generator (compile-time only) -->
-<dependency>
-    <groupId>io.crysknife.ui</groupId>
-    <artifactId>crysknife-ui-rest-generator</artifactId>
-    <version>${crysknife.version}</version>
-    <scope>provided</scope>
 </dependency>
 
 <!-- JAX-RS annotations (J2CL-compatible) -->
@@ -1793,36 +1785,19 @@ Add the following dependencies to your `pom.xml`:
     <artifactId>jax-rs</artifactId>
     <version>0.8</version>
 </dependency>
+```
 
-<!-- jakarta4g-rest runtime -->
-<dependency>
-    <groupId>org.treblereel.gwt.jakarta.rest</groupId>
-    <artifactId>api</artifactId>
-    <version>0.1-SNAPSHOT</version>
-</dependency>
+Add the generator to your annotation processor paths in `maven-compiler-plugin`. It transitively pulls in the `jakarta4g-rest` and `json-mapper` annotation processors:
 
-<!-- JSON Mapper runtime -->
-<dependency>
-    <groupId>org.treblereel.gwt.json.mapper</groupId>
-    <artifactId>common</artifactId>
-    <version>0.9</version>
-</dependency>
-
-<!-- jakarta4g-rest annotation processor (compile-time only) -->
-<dependency>
-    <groupId>org.treblereel.gwt.jakarta.rest</groupId>
-    <artifactId>processor</artifactId>
-    <version>0.1-SNAPSHOT</version>
-    <scope>provided</scope>
-</dependency>
-
-<!-- JSON Mapper annotation processor (compile-time only) -->
-<dependency>
-    <groupId>org.treblereel.gwt.json.mapper</groupId>
-    <artifactId>processor</artifactId>
-    <version>0.9</version>
-    <scope>provided</scope>
-</dependency>
+```xml
+<annotationProcessorPaths>
+    <!-- ... other crysknife processors ... -->
+    <path>
+        <groupId>io.crysknife.ui</groupId>
+        <artifactId>crysknife-ui-rest-generator</artifactId>
+        <version>${crysknife.version}</version>
+    </path>
+</annotationProcessorPaths>
 ```
 
 ### 3.7.2. Defining a JAX-RS Service Interface

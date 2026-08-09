@@ -42,11 +42,6 @@
             <version>${crysknife.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.treblereel.gwt.jakarta.websocket</groupId>
-            <artifactId>common</artifactId>
-            <version>${jakarta4g.websocket.version}</version>
-        </dependency>
-        <dependency>
             <groupId>io.crysknife.ui</groupId>
             <artifactId>crysknife-ui-websocket-api</artifactId>
             <version>${crysknife.version}</version>
@@ -86,16 +81,6 @@
                         <path>
                             <groupId>io.crysknife.ui</groupId>
                             <artifactId>crysknife-ui-websocket-generator</artifactId>
-                            <version>${crysknife.version}</version>
-                        </path>
-                        <path>
-                            <groupId>io.crysknife</groupId>
-                            <artifactId>crysknife-core</artifactId>
-                            <version>${crysknife.version}</version>
-                        </path>
-                        <path>
-                            <groupId>io.crysknife.ui</groupId>
-                            <artifactId>crysknife-ui-core</artifactId>
                             <version>${crysknife.version}</version>
                         </path>
                         <path>
