@@ -35,16 +35,6 @@
             <version>${crysknife.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.treblereel.gwt.jakarta.rest</groupId>
-            <artifactId>api</artifactId>
-            <version>${jakarta4g.rest.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.treblereel.gwt.json.mapper</groupId>
-            <artifactId>common</artifactId>
-            <version>${mapper.json.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.treblereel.j2cl.processors</groupId>
             <artifactId>annotations</artifactId>
             <version>${org.treblereel.j2cl.processors.version}</version>
@@ -82,31 +72,6 @@
                             <version>${crysknife.version}</version>
                         </path>
                         <path>
-                            <groupId>io.crysknife</groupId>
-                            <artifactId>crysknife-core</artifactId>
-                            <version>${crysknife.version}</version>
-                        </path>
-                        <path>
-                            <groupId>io.crysknife.ui</groupId>
-                            <artifactId>crysknife-ui-core</artifactId>
-                            <version>${crysknife.version}</version>
-                        </path>
-                        <path>
-                            <groupId>io.crysknife.ui</groupId>
-                            <artifactId>crysknife-ui-rest-api</artifactId>
-                            <version>${crysknife.version}</version>
-                        </path>
-                        <path>
-                            <groupId>org.treblereel.gwt.jakarta.rest</groupId>
-                            <artifactId>processor</artifactId>
-                            <version>${jakarta4g.rest.version}</version>
-                        </path>
-                        <path>
-                            <groupId>org.treblereel.gwt.json.mapper</groupId>
-                            <artifactId>processor</artifactId>
-                            <version>${mapper.json.version}</version>
-                        </path>
-                        <path>
                             <groupId>org.treblereel.j2cl.processors</groupId>
                             <artifactId>processors</artifactId>
                             <version>${org.treblereel.j2cl.processors.version}</version>
@@ -130,7 +95,7 @@
                 <configuration>
                     <webappDirectory>${project.build.directory}/j2cl/launcherDir</webappDirectory>
                     <initialScriptFilename>app.js</initialScriptFilename>
-                    <compilationLevel>SIMPLE</compilationLevel>
+                    <compilationLevel>ADVANCED</compilationLevel>
                     <annotationProcessorMode>IGNORE_MAVEN</annotationProcessorMode>
                 </configuration>
             </plugin>

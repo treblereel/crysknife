@@ -59,7 +59,6 @@ import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ClassInfoList;
 import io.github.classgraph.ScanResult;
 
-
 @AutoService(Processor.class)
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
 public class ApplicationProcessor extends AbstractProcessor {

@@ -83,6 +83,7 @@
         <auto.service.version>1.1.1</auto.service.version>
         <mockito.core.version>5.21.0</mockito.core.version>
         <jakarta4g.rest.version>0.2</jakarta4g.rest.version>
+        <mapper.json.version>0.10</mapper.json.version>
         <gson.version>2.13.1</gson.version>
         <jakarta4g.websocket.version>0.1</jakarta4g.websocket.version>
     </properties>
@@ -182,6 +183,21 @@
                 <groupId>org.treblereel.gwt.jakarta.rest</groupId>
                 <artifactId>api</artifactId>
                 <version>${jakarta4g.rest.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.treblereel.gwt.jakarta.rest</groupId>
+                <artifactId>processor</artifactId>
+                <version>${jakarta4g.rest.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.treblereel.gwt.json.mapper</groupId>
+                <artifactId>common</artifactId>
+                <version>${mapper.json.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.treblereel.gwt.json.mapper</groupId>
+                <artifactId>processor</artifactId>
+                <version>${mapper.json.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>
