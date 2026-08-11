@@ -12,9 +12,11 @@
  * the License.
  */
 
-package io.crysknife.demo.client.rest;
+package io.crysknife.demo.client.websocket;
 
+import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLDivElement;
+import elemental2.dom.HTMLElement;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -22,15 +24,32 @@ import io.crysknife.client.IsElement;
 import io.crysknife.ui.navigation.client.annotation.Page;
 import io.crysknife.ui.templates.client.annotation.DataField;
 import io.crysknife.ui.templates.client.annotation.Templated;
+import io.crysknife.ui.websocket.client.WebSocketConnector;
 
 @Singleton
 @Page
-@Templated("restdemo.html")
-public class RestDemo implements IsElement<HTMLDivElement> {
+@Templated("websocketdemo.html")
+public class WebSocketDemo implements IsElement<HTMLDivElement> {
+
+    @Inject
+    WebSocketConnector<ChatEndpoint> connector;
+
+    @Inject
+    ChatEndpoint chatEndpoint;
 
     @Inject
     @DataField
     HTMLDivElement root;
+
+    @Inject
+    @DataField
+    HTMLDivElement logArea;
+
+    public void addLog(String message) {
+        HTMLElement entry = (HTMLElement) DomGlobal.document.createElement("div");
+        entry.textContent = message;
+        logArea.appendChild(entry);
+    }
 
     @Override
     public HTMLDivElement getElement() {

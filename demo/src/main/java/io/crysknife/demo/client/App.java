@@ -91,7 +91,8 @@ public class App {
                         .addItem(navigationItem("databinder", "DataBinder", "#DataBinderDemo"))
                         .addItem(navigationItem("navigation", "Navigation", "#navigation"))
                         .addItem(navigationItem("mutation", "MutationObserver", "#MutationObserverDemo"))
-                        .addItem(navigationItem("rest", "REST Client", "#RestDemo")))));
+                        .addItem(navigationItem("rest", "REST Client", "#RestDemo"))
+                        .addItem(navigationItem("websocket", "WebSocket", "#WebSocketDemo")))));
         sidebar.collapse(false);
 
         body().add(page()
