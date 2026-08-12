@@ -6,7 +6,7 @@
 
     <groupId>io.crysknife.tests</groupId>
     <artifactId>jre-rest-keycloak-api</artifactId>
-    <version>0.10</version>
+    <version>0.11</version>
     <packaging>jar</packaging>
 
     <name>Crysknife :: Tests :: JRE :: REST :: Keycloak :: API</name>
@@ -19,7 +19,7 @@
         <maven.deploy.skip>true</maven.deploy.skip>
 
         <jakarta4g.rest.version>0.2</jakarta4g.rest.version>
-        <mapper.json.version>0.10</mapper.json.version>
+        <mapper.json.version>0.11</mapper.json.version>
     </properties>
 
     <dependencies>

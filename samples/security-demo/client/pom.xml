@@ -16,9 +16,9 @@
     <name>Crysknife Sample :: Security Demo :: Client</name>
 
     <properties>
-        <crysknife.version>0.10</crysknife.version>
+        <crysknife.version>0.11</crysknife.version>
         <j2cl.platform.version>20260527-1</j2cl.platform.version>
-        <j2cl.processors.version>0.10</j2cl.processors.version>
+        <j2cl.processors.version>0.11</j2cl.processors.version>
     </properties>
 
     <dependencyManagement>

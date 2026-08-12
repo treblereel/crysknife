@@ -5,7 +5,7 @@
 
     <groupId>io.crysknife</groupId>
     <artifactId>crysknife-parent</artifactId>
-    <version>0.10</version>
+    <version>0.11</version>
     <packaging>pom</packaging>
 
     <name>Crysknife</name>
@@ -59,7 +59,7 @@
         <maven.surefire.plugin.version>3.0.0-M5</maven.surefire.plugin.version>
         <maven.flatten.plugin>1.2.2</maven.flatten.plugin>
         <maven.checkstyle.plugin>3.2.0</maven.checkstyle.plugin>
-        <maven.central.publishing.plugin>0.10.0</maven.central.publishing.plugin>
+        <maven.central.publishing.plugin>0.11.0</maven.central.publishing.plugin>
 
         <version.checkstyle>8.29</version.checkstyle>
         <checkstyle.header.templateFile>LICENSE.header</checkstyle.header.templateFile>

@@ -7,11 +7,15 @@
     <parent>
         <groupId>io.crysknife.tests</groupId>
         <artifactId>j2cl-tests-rest-parent</artifactId>
-        <version>0.10</version>
+        <version>0.11</version>
     </parent>
 
     <artifactId>j2cl-tests-rest-client</artifactId>
     <name>Crysknife :: Tests :: J2CL :: REST :: Client</name>
+
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
 
     <dependencies>
         <dependency>

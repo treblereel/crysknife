@@ -6,7 +6,7 @@
 
     <groupId>io.crysknife</groupId>
     <artifactId>bom</artifactId>
-    <version>0.10</version>
+    <version>0.11</version>
     <packaging>pom</packaging>
 
 
@@ -47,7 +47,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <maven.gpg.plugin.version>3.2.8</maven.gpg.plugin.version>
-        <maven.central.publishing.plugin>0.10.0</maven.central.publishing.plugin>
+        <maven.central.publishing.plugin>0.11.0</maven.central.publishing.plugin>
     </properties>
 
     <dependencyManagement>

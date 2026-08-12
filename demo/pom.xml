@@ -5,7 +5,7 @@
 
   <groupId>io.crysknife.demo</groupId>
   <artifactId>demo</artifactId>
-  <version>0.10</version>
+  <version>0.11</version>
   <packaging>jar</packaging>
 
   <name>Crysknife :: Demo</name>
@@ -19,10 +19,10 @@
     <maven.compiler.target>21</maven.compiler.target>
 
     <j2cl.platform.version>20260527-1</j2cl.platform.version>
-    <org.treblereel.j2cl.processors.version>0.10</org.treblereel.j2cl.processors.version>
+    <org.treblereel.j2cl.processors.version>0.11</org.treblereel.j2cl.processors.version>
 
     <jakarta4g.rest.version>0.2</jakarta4g.rest.version>
-    <mapper.json.version>0.10</mapper.json.version>
+    <mapper.json.version>0.11</mapper.json.version>
     <gwt.jakarta.version>0.8</gwt.jakarta.version>
   </properties>
 
