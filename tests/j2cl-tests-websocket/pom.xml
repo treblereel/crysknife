@@ -24,7 +24,7 @@
     <parent>
         <groupId>io.crysknife.tests</groupId>
         <artifactId>tests-parent</artifactId>
-        <version>0.10</version>
+        <version>0.11</version>
     </parent>
 
     <artifactId>j2cl-tests-websocket-parent</artifactId>
@@ -38,6 +38,7 @@
         <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
         <jakarta4g.websocket.version>0.1</jakarta4g.websocket.version>
+        <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
     <modules>

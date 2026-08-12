@@ -6,7 +6,7 @@
 
     <groupId>io.crysknife.tests</groupId>
     <artifactId>j2cl-tests-translation-en</artifactId>
-    <version>0.10</version>
+    <version>0.11</version>
     <name>Crysknife :: Tests :: J2CL :: Translation EN</name>
     <description>J2CL browser tests for TranslationBundle with default (English) locale</description>
 
@@ -24,6 +24,7 @@
         <crysknife.version>0.10</crysknife.version>
         <j2cl.platform.version>20260527-1</j2cl.platform.version>
         <org.treblereel.j2cl.processors.version>0.10</org.treblereel.j2cl.processors.version>
+        <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
     <dependencyManagement>
