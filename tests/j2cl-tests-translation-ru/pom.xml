@@ -157,7 +157,7 @@
             <plugin>
                 <groupId>org.kie.j2cl.tools</groupId>
                 <artifactId>j2cl-maven-plugin</artifactId>
-                <version>0.23.8</version>
+                <version>0.23.9</version>
                 <executions>
                     <execution>
                         <id>j2cl-test</id>

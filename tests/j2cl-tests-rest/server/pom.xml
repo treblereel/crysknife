@@ -61,13 +61,13 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-chrome-driver</artifactId>
-            <version>4.12.1</version>
+            <version>4.48.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-support</artifactId>
-            <version>4.12.1</version>
+            <version>4.48.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
