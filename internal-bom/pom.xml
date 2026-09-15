@@ -73,11 +73,11 @@
         <google.guava.version>32.1.2-jre</google.guava.version>
         <classgraph.classgraph.version>4.8.181</classgraph.classgraph.version>
         <org.treblereel.j2cl.processors.version>0.11</org.treblereel.j2cl.processors.version>
-        <closure.compiler.version>v20221004</closure.compiler.version>
+        <closure.compiler.version>v20260909</closure.compiler.version>
 
 
-        <gwt.jakarta.version>0.8</gwt.jakarta.version>
-        <j2cl.platform.version>20260527-1</j2cl.platform.version>
+        <gwt.jakarta.version>0.9</gwt.jakarta.version>
+        <j2cl.platform.version>20260906-1</j2cl.platform.version>
         <javaparser.core.version>3.28.2</javaparser.core.version>
         <auto.common.version>1.2.2</auto.common.version>
         <mockito.core.version>5.21.0</mockito.core.version>
@@ -211,6 +211,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
+                <version>${maven.deploy.plugin.version}</version>
             </plugin>
         </plugins>
     </build>
