@@ -29,6 +29,7 @@
 
     <artifactId>j2cl-tests-websocket-client</artifactId>
     <name>Crysknife :: Tests :: J2CL :: WebSocket :: Client</name>
+    <version>0.12-SNAPSHOT</version>
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
@@ -53,7 +54,7 @@
         <dependency>
             <groupId>org.treblereel.j2cl.processors</groupId>
             <artifactId>annotations</artifactId>
-            <version>0.12-SNAPSHOT</version>
+            <version>0.11</version>
         </dependency>
     </dependencies>
 
@@ -90,7 +91,7 @@
                         <path>
                             <groupId>org.treblereel.j2cl.processors</groupId>
                             <artifactId>processors</artifactId>
-                            <version>0.12-SNAPSHOT</version>
+                            <version>0.11</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
