@@ -16,7 +16,7 @@
     <name>Crysknife Sample :: Multi-Module :: Client</name>
 
     <properties>
-        <crysknife.version>0.11</crysknife.version>
+        <crysknife.version>0.12-SNAPSHOT</crysknife.version>
         <j2cl.platform.version>20260906-1</j2cl.platform.version>
         <j2cl.processors.version>0.11</j2cl.processors.version>
     </properties>
@@ -143,7 +143,7 @@
             <plugin>
                 <groupId>org.treblereel.j2cl.plugin</groupId>
                 <artifactId>j2cl-maven-plugin</artifactId>
-                <version>0.24.1</version>
+                <version>0.24.2</version>
                 <executions>
                     <execution>
                         <id>build-js</id>

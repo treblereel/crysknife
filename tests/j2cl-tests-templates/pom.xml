@@ -21,7 +21,7 @@
         <maven.deploy.plugin.version>3.0.0-M2</maven.deploy.plugin.version>
         <maven.surefire.plugin.version>3.1.0</maven.surefire.plugin.version>
 
-        <crysknife.version>0.11</crysknife.version>
+        <crysknife.version>0.12-SNAPSHOT</crysknife.version>
         <j2cl.platform.version>20260527-1</j2cl.platform.version>
         <org.treblereel.j2cl.processors.version>0.11</org.treblereel.j2cl.processors.version>
         <selenium.version>4.48.0</selenium.version>
@@ -151,7 +151,7 @@
             <plugin>
                 <groupId>org.treblereel.j2cl.plugin</groupId>
                 <artifactId>j2cl-maven-plugin</artifactId>
-                <version>0.24.1</version>
+                <version>0.24.2</version>
                 <executions>
                     <execution>
                         <id>build-js</id>
